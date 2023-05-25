@@ -10,64 +10,16 @@
   "categories": [
     "Other"
   ],
+  "repository": {
+    "url": "https://github.com/wuazhu/vscode-plugin"
+  },
   "icon": "images/logo.png",
   "activationEvents": [
-		"onCommand:extension.zopHello",
-    "onView:zopCheckDebugToolView"
   ],
+  "extensionDependencies": [
+		"toolchain.Tortie-preview"
+	],
   "main": "./out/extension.js",
-  "contributes": {
-    
-    "commands": [
-      {
-        "command": "zop-plugin.zopHello",
-        "title": "zopHello"
-      }
-    ],
-    "menus": {
-      "editor/context": [
-        {
-          "when": "editorFocus",
-          "command": "zop-plugin.zopHello",
-          "group": "navigation@1"
-        }
-      ]
-    },
-    
-    "viewsContainers": {
-			"activitybar": [
-				{
-					"id": "zopview",
-					"title": "zopview",
-					"icon": "images/car.svg"
-				}
-			]
-		},
-    "views": {
-      "zopview": [
-          {
-              "id": "zopCodeGenerate",
-              "name": "代码生成工具"
-          },
-          {
-              "id": "zopEditorDebugTool",
-              "name": "编辑调试工具"
-          },
-          {
-              "id": "zopCheckDebugToolView",
-              "name": "验证调试工具"
-          },
-          {
-              "id": "zopSetting",
-              "name": "设置"
-          },
-          {
-              "id": "checkDebugTool",
-              "name": "帮助和反馈"
-          }
-      ]
-    }
-  },
   
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -78,16 +30,133 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.78.0",
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
+    "@types/vscode": "^1.78.0",
     "@typescript-eslint/eslint-plugin": "^5.59.1",
     "@typescript-eslint/parser": "^5.59.1",
+    "@vscode/test-electron": "^2.3.0",
     "eslint": "^8.39.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
-    "typescript": "^5.0.4",
-    "@vscode/test-electron": "^2.3.0"
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "nanoid": "^4.0.2"
+  },
+  "contributes": {
+    "configuration": {
+      "title": "zop-plugin",
+      "properties": {
+        "Zoks: Global SDK Path": {
+          "type": "string",
+          "default": "",
+          "description": "请设置你的SDK目录"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "zopPlugin.addNewNode",
+        "title": "添加配置"
+      },
+      {
+        "command": "zopPlugin.renameNode",
+        "title": "修改名称"
+      },
+      {
+        "command": "zopPlugin.removeNode",
+        "title": "删除"
+      },
+      {
+        "command": "Build_setting_click",
+        "title": "打开配置页面"
+      },
+      {
+        "command": "view.refresh",
+        "title": "刷新",
+        "icon":{
+          "dark": "images/dark_icon_refresh.png.png",
+          "light": "images/light_icon_refresh.png.png"
+        }
+      },
+      {
+        "command": "toolChain.click",
+        "title": "工具链",
+        "icon":{
+          "dark": "images/dark_icon_refresh.png.png",
+          "light": "images/light_icon_refresh.png.png"
+        }
+      },
+      {
+        "command": "zopPlugin.delCache",
+        "title": "清理缓存"
+      }
+    ],
+    "menus": {
+      "editor/context": [],
+      "view/title": [
+        {
+          "command": "view.refresh",
+          "when": "view == zopCompileDebugView",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "zopPlugin.addNewNode",
+          "when": "(view == zopCodeGenerate || view == zopCompileDebugView) && (viewItem == Build_setting)"
+        },
+        {
+          "command": "zopPlugin.renameNode",
+          "when": "(view == zopCodeGenerate || view == zopCompileDebugView) && (viewItem == Build_setting_child)"
+        },
+        {
+          "command": "zopPlugin.removeNode",
+          "when": "(view == zopCodeGenerate || view == zopCompileDebugView) && (viewItem == Build_setting_child)"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "zopview",
+          "title": "zopview",
+          "icon": "images/car.svg"
+        }
+      ]
+    },
+    "views": {
+      "zopview": [
+        {
+          "id": "zopCodeGenerate",
+          "name": "代码生成工具"
+        },
+        {
+          "id": "zopCompileDebugView",
+          "name": "编译调试工具"
+        },
+        {
+          "id": "zopCheckDebugToolView",
+          "name": "验证调试工具"
+        },
+        {
+          "id": "zopSetting",
+          "name": "设置"
+        },
+        {
+          "id": "zopHelpFeedbackView",
+          "name": "帮助和反馈"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "zopHelpFeedbackView",
+        "contents": "简介: ZKOS SDK使用帮助\n当前版本: v0.0.1\n[$(preview)zkos主页](https://zkos.zeekrlife.com/zh/home/)\n"
+      }
+    ]
   }
 }

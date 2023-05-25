@@ -11,7 +11,7 @@ interface MyTreeNode {
 class MyTreeDataProvider implements vscode.TreeDataProvider<MyTreeNode> {
     // 定义数据源，这里只是一个示例
     private readonly data: MyTreeNode[] = [
-      { id: 1, label: '节点1', iconPath: 'images/service.svg' },
+      { id: 1, label: '服务验证', iconPath: 'images/service.svg' },
       { id: 2, label: '节点2', children: [
         { id: 3, label: '子节点1' },
         { id: 4, label: '子节点2' },
@@ -43,7 +43,7 @@ class MyTreeDataProvider implements vscode.TreeDataProvider<MyTreeNode> {
             title: 'click',
             arguments: [node],
         },
-        // collapsibleState: node.children ? vscode.TreeItemCollapsibleState.Collapsed : node.iconPath
+        collapsibleState: node.children?.length ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None
       };
     }
   }
@@ -54,7 +54,10 @@ class MyTreeDataProvider implements vscode.TreeDataProvider<MyTreeNode> {
         context.subscriptions.push(view);
 
         const treeItemClickedEvent = vscode.commands.registerCommand('zopCheckDebugToolView.treeItemClicked', (node: MyTreeNode) => {
+            console.log('当前点击节点',node);
+            vscode.commands.executeCommand('extension.openServiceWebview');
             vscode.window.showInformationMessage(`你点击了 ${node.label}`);
+
         });
 	    context.subscriptions.push(treeItemClickedEvent);
         
