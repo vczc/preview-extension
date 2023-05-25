@@ -2,33 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.openWebview = void 0;
 const vscode = require("vscode");
+// import * as path from "path";
+// import * as fs from "fs";
 let webviewMap = {};
 const getHtmlContent = (router) => (`
-  <!DOCTYPE html>
-    <html lang="en">
-        <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <style>
-                html,
-                body {
-                        margin: 0 !important;
-                        padding: 0 !important;
-                        width: 100%;
-                        height: 100%;
-                }
-                .zkos-sdk-plugin-webview {
-                        width: 100%;
-                        height: 100%;
-                }
-        </style>
-        </head>
-
-        <body>
-        <iframe id="zkosSDKPluginWebview" class="zkos-sdk-plugin-webview" src="${router}" scrolling="auto"></iframe>
-        <div id="app" class="zkos-sdk-plugin-webview"></div>
-        </body>
-    </html>
+  <html">
+    <body style="margin:0;padding:0;min-height:100vh;background:red;">
+    <iframe src="http://localhost:5173/" width="100%" style="width:100vw;border:none;height:100vh;"></iframe>
+    </body>
+  </html>
 `);
 const openWebview = (context, id, title = '网页标题') => {
     const _currentWebview = webviewMap[id];
