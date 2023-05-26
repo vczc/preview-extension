@@ -43,7 +43,7 @@ export function useTopicHook() {
   const initData = async () => {
     const _fields = await getFields({ appname: '' })
     if (_fields.code === 200) {
-      const formatteFields: Field[] = _fields.data.map((item) => {
+      const formatteFields: Field[] = _fields!.data!.map((item) => {
         return {
           value: item,
           label: item,
@@ -51,7 +51,7 @@ export function useTopicHook() {
         }
       })
       fields.fieldsSource = formatteFields
-      _fields.data.forEach(async (item) => {
+      _fields!.data!.forEach(async (item) => {
         // init selecter details
         // TODO: 记得打开下面注释
         // initDetail(item)

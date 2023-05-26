@@ -3,12 +3,17 @@ import { defineStore } from 'pinia'
 export const useServicesStore = defineStore('services', {
   state: () => ({
     form: {
-      version: 'V1.2.0',
-      platform_info: 'QNX',
-      ip_address: '172.17.0.2',
-      mask: '255.255.255.0',
-      arxml:
-        '/home/a/work/soa/new_tool/svt/backend/files/arxml/ZSDB222400_ChargeService_1_P_PropulsionASWC_CSCBCACore.arxml'
+      version: '',
+      platform_info: '',
+      ip_address: '',
+      mask: '',
+      arxml: ''
+      // version: 'V1.2.0',
+      // platform_info: 'QNX',
+      // ip_address: '172.17.0.2',
+      // mask: '255.255.255.0',
+      // arxml:
+      //   '/home/a/work/soa/new_tool/svt/backend/files/arxml/ZSDB222400_ChargeService_1_P_PropulsionASWC_CSCBCACore.arxml'
     },
     topicDetail: {
       // OnBdChrgrPwrEnaAllwdStatus: {
@@ -124,7 +129,7 @@ export const useServicesStore = defineStore('services', {
       this.topicDetail[topicName] = payload;
     }
   }
-})
+});
 
 interface TopicDetail {
   [key: string]: any

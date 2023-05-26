@@ -1,54 +1,39 @@
-import { createApp } from 'vue';
-import '../../assets/style.css';
-import App from './App.vue';
-import router from './router';
-
-import ElementPlus from 'element-plus';
-
-let redirectData: any = {};
-
-declare module '@vue/runtime-core' {
-  interface ComponentCustomProperties {
-    $vscode: any
-  }
-}
-
-declare namespace window {
-	interface window {
-		[key: string]: any
-	}
-}
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const vue_1 = require("vue");
+require("../../assets/style.css");
+const App_vue_1 = require("./App.vue");
+const router_1 = require("./router");
+const element_plus_1 = require("element-plus");
+let redirectData = {};
 // 两种模式
 // dev模式
 // build模式
-
-async function main () {
-  try {
-    const appElementInstance = createApp(App);
-		appElementInstance.use(router);
-		appElementInstance.use(ElementPlus);
-    appElementInstance.mount('#app');
-		appElementInstance.config.globalProperties.$vscode = window?.acquireVsCodeApi?.();
-		// router.push({
-		// 	...redirectData.replace,
-		// 	state: {
-		// 		params: redirectData?.params
-		// 	},
-		// 	replace: true
-		// }); // 业务页面切换
-  } catch (error: any) {
-    console.log(error);
-  }
+async function main() {
+    try {
+        const appElementInstance = (0, vue_1.createApp)(App_vue_1.default);
+        appElementInstance.use(router_1.default);
+        appElementInstance.use(element_plus_1.default);
+        appElementInstance.mount('#app');
+        appElementInstance.config.globalProperties.$vscode = window?.acquireVsCodeApi?.();
+        // router.push({
+        // 	...redirectData.replace,
+        // 	state: {
+        // 		params: redirectData?.params
+        // 	},
+        // 	replace: true
+        // }); // 业务页面切换
+    }
+    catch (error) {
+        console.log(error);
+    }
 }
 main();
-
 // window.onload = function () {
 // 	if (import.meta.env.DEV) {
 // 		redirectData = {
 // 			replace: '/build-config'
 // 		}
-	
 // 		main()
 // 	} else {
 // 		window.addEventListener('message', async (event) => { // 前端页面接收主进程发来的消息
@@ -66,9 +51,9 @@ main();
 // 				// 	(vscode?.postMessage || window.parent.postMessage)?.({ id: 'vscode:message', command: 'hello', data: 'world' }, '*');
 // 				// 	//debugger
 // 				// })
-	
 // 				main()
 // 			}
 // 		})
 // 	}
 // }
+//# sourceMappingURL=main.js.map
