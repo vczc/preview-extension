@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.errorMsg = exports.warningMsg = exports.infoMsg = exports.isExists = exports.getExtensionFileAbsolutePath = void 0;
+exports.isProd = exports.isDev = exports.errorMsg = exports.warningMsg = exports.infoMsg = exports.isExists = exports.getExtensionFileAbsolutePath = void 0;
 const fs = require("fs");
 const vscode = require("vscode");
 const path = require("path");
@@ -29,4 +29,12 @@ const errorMsg = (msg) => {
     vscode.window.showErrorMessage(msg);
 };
 exports.errorMsg = errorMsg;
+const isDev = () => {
+    return process.env.ZKOS_SDK_PLUGIN_ENV === 'development';
+};
+exports.isDev = isDev;
+const isProd = () => {
+    return process.env.ZKOS_SDK_PLUGIN_ENV === 'production';
+};
+exports.isProd = isProd;
 //# sourceMappingURL=index.js.map

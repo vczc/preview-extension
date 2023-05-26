@@ -154,7 +154,7 @@ function initCompileDebugView(context) {
     }));
     context.subscriptions.push(vscode.commands.registerCommand('Build_setting_click', (node) => {
         console.log('点击了Build_setting_click', node);
-        (0, webview_1.openWebview)(context, node.id, `${node.label}的配置`);
+        (0, webview_1.openWebview)(context, node.id, `${node.label}的配置`, 'http://localhost:5173/build.html/#/build-config', 'build.html');
     }));
 }
 exports.initCompileDebugView = initCompileDebugView;

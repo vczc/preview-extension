@@ -29,3 +29,10 @@ export const errorMsg = (msg: string) => {
 };
 
 
+export const isDev = () => {
+    return process.env.ZKOS_SDK_PLUGIN_ENV === 'development';
+};
+
+export const isProd = () => {
+    return process.env.ZKOS_SDK_PLUGIN_ENV === 'production';
+};

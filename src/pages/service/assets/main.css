@@ -1,0 +1,19 @@
+#service {
+  width: 100%;
+}
+
+.d-flex {
+  display: flex;
+}
+.align-center {
+  align-items: center;
+}
+.space-between {
+  justify-content: space-between;
+}
+.flex1 {
+  flex: 1;
+}
+.cursor {
+  cursor: pointer;
+}

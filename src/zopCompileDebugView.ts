@@ -2,13 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import { infoMsg, warningMsg } from './utils/index';
 import { openWebview } from './webview';
-
-export interface ZopViewNode extends vscode.TreeItem {
-    label: string;
-    contextValue: string;
-    parentId?: string;
-    children?: ZopViewNode[];
-}
+import { ZopViewNode } from './zopCodeGenerateView';
 
 export let zopCompileDebugProviderInstance: ZopCompileDebugTreeDataProvider | null = null;
 
@@ -174,7 +168,13 @@ export function initCompileDebugView(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(vscode.commands.registerCommand('Build_setting_click', (node) => {
         console.log('点击了Build_setting_click',node);
-        openWebview(context, node.id, `${node.label}的配置`);
+        openWebview(
+            context,
+            node.id,
+            `${node.label}的配置`,
+            'http://localhost:5173/build.html/#/build-config',
+            'build.html'
+        );
     }));
     
 }
