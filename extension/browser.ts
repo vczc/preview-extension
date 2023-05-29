@@ -7,11 +7,11 @@ import * as os from 'os';
 import { ExtensionConfiguration } from './extensionConfiguration';
 import * as edge from '@chiragrupani/karma-chromium-edge-launcher';
 import * as chrome from 'karma-chrome-launcher';
-const puppeteer = require('puppeteer-core');
+import puppeteer from 'puppeteer-core';
 
 export default class Browser extends EventEmitter {
   private browser: any;
-  public remoteDebugPort: number = 0;
+  public remoteDebugPort = 0;
   public chromeArgs: any;
 
   constructor(private config: ExtensionConfiguration) {
@@ -20,9 +20,8 @@ export default class Browser extends EventEmitter {
 
   private async launchBrowser() {
     let chromePath = this.getChromiumPath();
-    let chromeArgs = [];
     this.chromeArgs = [];
-    let platform = os.platform();
+    const platform = os.platform();
 
     if (this.config.chromeExecutable) {
       chromePath = this.config.chromeExecutable;
@@ -45,8 +44,8 @@ export default class Browser extends EventEmitter {
     // 最大限度地启动浏览器，而不考虑以前的任何设置。↪
     this.chromeArgs.push('--start-maximized');
 
-    let extensionSettings = vscode.workspace.getConfiguration('browser-preview');
-    let ignoreHTTPSErrors = extensionSettings.get<boolean>('ignoreHttpsErrors');
+    const extensionSettings = vscode.workspace.getConfiguration('browser-preview');
+    const ignoreHTTPSErrors = extensionSettings.get<boolean>('ignoreHttpsErrors');
 
     this.browser = await puppeteer.launch({
       headless: true, // 无头chrome模式
@@ -56,18 +55,6 @@ export default class Browser extends EventEmitter {
       ignoreHTTPSErrors,
       defaultViewport: null,
     });
-
-    const setup = async () => {
-      this.browser = await puppeteer.launch({
-        headless: true, // 无头chrome模式
-        executablePath: chromePath,
-        args: this.chromeArgs,
-        // args: ['--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage'],
-        ignoreHTTPSErrors,
-        defaultViewport: null,
-      });
-      this.browser.on('disconnected', setup);
-    };
   }
 
   public async newPage(): Promise<BrowserPage> {
@@ -75,13 +62,13 @@ export default class Browser extends EventEmitter {
       await this.launchBrowser();
     }
 
-    var page = new BrowserPage(this.browser);
+    const page = new BrowserPage(this.browser);
     await page.launch();
     return page;
   }
 
   public dispose(): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       if (this.browser) {
         this.browser.close();
         this.browser = null;

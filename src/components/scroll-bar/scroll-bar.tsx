@@ -12,16 +12,16 @@ interface ScrollBarProps {
   handleMouseEvent: (event: any) => void;
 }
 
-// 位移距离
-const DISTANCE: number = 8;
-
-// 某个滚动条两个按钮的宽高之和
-const BTNDOUBLEWH = 24;
-
 export default class ScrollBar extends React.PureComponent<ScrollBarProps, any> {
   private pageX: number;
   private pageY: number;
   private isScroll: boolean;
+
+  // 位移距离
+  static DISTANCE = 8;
+
+  // 某个滚动条两个按钮的宽高之和
+  static BTNDOUBLEWH = 24;
 
   constructor(props: ScrollBarProps) {
     super(props);
@@ -37,7 +37,7 @@ export default class ScrollBar extends React.PureComponent<ScrollBarProps, any> 
       deltaX,
       deltaY,
       offsetX: 0,
-      offsetY: 0
+      offsetY: 0,
     });
   };
 
@@ -66,7 +66,7 @@ export default class ScrollBar extends React.PureComponent<ScrollBarProps, any> 
     const { clientX } = event;
 
     let deltaX = clientX - pageX;
-    deltaX = clientX >= pageX ? deltaX + DISTANCE : deltaX - DISTANCE;
+    deltaX = clientX >= pageX ? deltaX + ScrollBar.DISTANCE : deltaX - ScrollBar.DISTANCE;
 
     wheelScrollAction({ deltaX });
 
@@ -83,7 +83,7 @@ export default class ScrollBar extends React.PureComponent<ScrollBarProps, any> 
     const { clientY } = event;
 
     let deltaY = clientY - pageY;
-    deltaY = clientY >= pageY ? deltaY + DISTANCE : deltaY - DISTANCE;
+    deltaY = clientY >= pageY ? deltaY + ScrollBar.DISTANCE : deltaY - ScrollBar.DISTANCE;
 
     wheelScrollAction({ deltaY });
 
@@ -91,7 +91,7 @@ export default class ScrollBar extends React.PureComponent<ScrollBarProps, any> 
   };
 
   // 鼠标抬起事件处理
-  private mouseUpHandler = (event: MouseEvent) => {
+  private mouseUpHandler = () => {
     this.isScroll = false;
     document.removeEventListener('mousemove', this.mouseMoveHandlerX);
     document.removeEventListener('mousemove', this.mouseMoveHandlerY);
@@ -107,32 +107,36 @@ export default class ScrollBar extends React.PureComponent<ScrollBarProps, any> 
             className="resize-scroll-y-btn resize-scroll-y-top"
             onClick={() => {
               this.wheelScrollAction({ deltaY: -100 });
-            }}></div>
+            }}
+          ></div>
           <div
             style={{
-              height: `${this.props.height - BTNDOUBLEWH}px`,
+              height: `${this.props.height - ScrollBar.BTNDOUBLEWH}px`,
               display: 'flex',
               justifyContent: 'center',
-              position: 'relative'
+              position: 'relative',
             }}
             onWheel={event => {
               this.props.handleMouseEvent(event);
-            }}>
+            }}
+          >
             <div
               className="resize-scroll-y"
               onMouseDown={event => {
                 this.mouseDownHandler(event, 'y');
               }}
               style={{
-                height: `${(this.props.height - BTNDOUBLEWH) * (this.props.viewport.height / this.props.scrollHeight)}px`,
-                top: `${(this.props.height - BTNDOUBLEWH) * (this.props.viewport.scrollOffsetY / this.props.scrollHeight)}px`
-              }}></div>
+                height: `${(this.props.height - ScrollBar.BTNDOUBLEWH) * (this.props.viewport.height / this.props.scrollHeight)}px`,
+                top: `${(this.props.height - ScrollBar.BTNDOUBLEWH) * (this.props.viewport.scrollOffsetY / this.props.scrollHeight)}px`,
+              }}
+            ></div>
           </div>
           <div
             className="resize-scroll-y-btn resize-scroll-y-button"
             onClick={() => {
               this.wheelScrollAction({ deltaY: 100 });
-            }}></div>
+            }}
+          ></div>
         </div>
       );
     }
@@ -145,32 +149,36 @@ export default class ScrollBar extends React.PureComponent<ScrollBarProps, any> 
             className="resize-scroll-x-btn resize-scroll-x-left"
             onClick={() => {
               this.wheelScrollAction({ deltaX: -100 });
-            }}></div>
+            }}
+          ></div>
           <div
             style={{
-              width: `${this.props.width - BTNDOUBLEWH}px`,
+              width: `${this.props.width - ScrollBar.BTNDOUBLEWH}px`,
               display: 'flex',
               alignItems: 'center',
-              position: 'relative'
+              position: 'relative',
             }}
             onWheel={event => {
               this.props.handleMouseEvent(event);
-            }}>
+            }}
+          >
             <div
               className="resize-scroll-x"
               onMouseDown={event => {
                 this.mouseDownHandler(event, 'x');
               }}
               style={{
-                width: `${(this.props.width - BTNDOUBLEWH) * (this.props.viewport.width / this.props.scrollWidth)}px`,
-                left: `${(this.props.width - BTNDOUBLEWH) * (this.props.viewport.scrollOffsetX / this.props.scrollWidth)}px`
-              }}></div>
+                width: `${(this.props.width - ScrollBar.BTNDOUBLEWH) * (this.props.viewport.width / this.props.scrollWidth)}px`,
+                left: `${(this.props.width - ScrollBar.BTNDOUBLEWH) * (this.props.viewport.scrollOffsetX / this.props.scrollWidth)}px`,
+              }}
+            ></div>
           </div>
           <div
             className="resize-scroll-x-btn resize-scroll-x-right"
             onClick={() => {
               this.wheelScrollAction({ deltaX: 100 });
-            }}></div>
+            }}
+          ></div>
         </div>
       );
     }

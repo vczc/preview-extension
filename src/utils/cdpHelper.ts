@@ -6,11 +6,11 @@ export class CDPHelper {
   }
 
   public async resolveElementProperties(objectId: any, maxDepth: number) {
-    let initialProperties = await this.getProperties(objectId);
+    const initialProperties = await this.getProperties(objectId);
 
-    let resolve = async (props: any, passedDepth: number) => {
-      let resolveResult = {};
-      let internalCurentDepth = passedDepth | 0;
+    const resolve = async (props: any, passedDepth: number) => {
+      const resolveResult = {};
+      const internalCurentDepth = passedDepth | 0;
 
       for (const item of props) {
         let value = null;
@@ -20,7 +20,7 @@ export class CDPHelper {
               if (internalCurentDepth < maxDepth) {
                 value = await this.getProperties(item.value.objectId);
                 if (Array.isArray(value)) {
-                  let newDepth = internalCurentDepth + 1;
+                  const newDepth = internalCurentDepth + 1;
                   value = await resolve(value, newDepth);
                 }
               } else {
@@ -42,13 +42,13 @@ export class CDPHelper {
           value: value,
           enumerable: item.enumerable,
           configurable: item.configurable,
-          writable: item.writable
+          writable: item.writable,
         });
       }
       return resolveResult;
     };
 
-    let result = await resolve(initialProperties, 0);
+    const result = await resolve(initialProperties, 0);
 
     return result;
   }
@@ -56,7 +56,7 @@ export class CDPHelper {
   public async getProperties(objectId: string) {
     const data: any = await this.connection.send('Runtime.getProperties', {
       objectId: objectId,
-      ownProperties: true
+      ownProperties: true,
     });
 
     return data.result as Array<object>;
@@ -72,19 +72,19 @@ export class CDPHelper {
       return;
     }
 
-    let computedStyleReq = await this.connection.send('CSS.getComputedStyleForNode', {
-      nodeId: nodeId
+    const computedStyleReq = await this.connection.send('CSS.getComputedStyleForNode', {
+      nodeId: nodeId,
     });
 
-    let cursorCSS = computedStyleReq.computedStyle.find((c: any) => c.name == 'cursor');
+    const cursorCSS = computedStyleReq.computedStyle.find((c: any) => c.name == 'cursor');
 
     return cursorCSS.value;
   }
 
   public async getNodeIdFromBackendId(backendNodeId: any) {
     await this.connection.send('DOM.getDocument');
-    let nodeIdsReq = await this.connection.send('DOM.pushNodesByBackendIdsToFrontend', {
-      backendNodeIds: [backendNodeId]
+    const nodeIdsReq = await this.connection.send('DOM.pushNodesByBackendIdsToFrontend', {
+      backendNodeIds: [backendNodeId],
     });
 
     if (nodeIdsReq) {

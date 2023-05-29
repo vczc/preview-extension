@@ -27,21 +27,21 @@ export class BrowserViewWindowManager extends EventEmitter.EventEmitter2 {
   }
 
   private refreshSettings() {
-    let extensionSettings = vscode.workspace.getConfiguration('browser-preview');
+    const extensionSettings = vscode.workspace.getConfiguration('browser-preview');
     if (extensionSettings) {
-      let chromeExecutable = extensionSettings.get<string>('chromeExecutable');
+      const chromeExecutable = extensionSettings.get<string>('chromeExecutable');
       if (chromeExecutable !== undefined) {
         this.defaultConfig.chromeExecutable = chromeExecutable;
       }
-      let startUrl = extensionSettings.get<string>('startUrl');
+      const startUrl = extensionSettings.get<string>('startUrl');
       if (startUrl !== undefined) {
         this.defaultConfig.startUrl = startUrl;
       }
-      let isVerboseMode = extensionSettings.get<boolean>('verbose');
+      const isVerboseMode = extensionSettings.get<boolean>('verbose');
       if (isVerboseMode !== undefined) {
         this.defaultConfig.isVerboseMode = isVerboseMode;
       }
-      let format = extensionSettings.get<string>('format');
+      const format = extensionSettings.get<string>('format');
       if (format !== undefined) {
         this.defaultConfig.format = format.includes('png') ? 'png' : 'jpeg';
       }
@@ -49,7 +49,7 @@ export class BrowserViewWindowManager extends EventEmitter.EventEmitter2 {
   }
 
   getLastColumnNumber() {
-    let lastWindow = Array.from(this.openWindows).pop();
+    const lastWindow = Array.from(this.openWindows).pop();
     if (lastWindow) {
       return lastWindow.config.columnNumber;
     }
@@ -58,22 +58,22 @@ export class BrowserViewWindowManager extends EventEmitter.EventEmitter2 {
 
   public async create(startUrl?: string, id?: string) {
     // this.refreshSettings();
-    let config = { ...this.defaultConfig };
+    const config = { ...this.defaultConfig };
 
     if (!this.browser) {
       this.browser = new Browser(config);
     }
 
-    let lastColumnNumber = this.getLastColumnNumber();
+    const lastColumnNumber = this.getLastColumnNumber();
     if (lastColumnNumber) {
       config.columnNumber = lastColumnNumber + 1;
     }
 
-    let window = new BrowserViewWindow(config, this.browser, id);
+    const window = new BrowserViewWindow(config, this.browser, id);
 
     await window.launch(startUrl);
     window.once('disposed', () => {
-      let id = window.id;
+      const id = window.id;
       this.openWindows.delete(window);
       if (this.openWindows.size === 0) {
         this.browser.dispose();

@@ -1,4 +1,3 @@
-// @ts-check
 import chalk from 'chalk';
 import { readFileSync } from 'fs';
 import path from 'path';

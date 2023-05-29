@@ -10,46 +10,46 @@ class ContextMenu extends React.Component<IContextMenuProps, IContextMenu> {
       isVisible: false,
       position: {
         x: 0,
-        y: 0
+        y: 0,
       },
       //assign menuItems
       menuItems: [
         {
           itemType: ContextMenuItemsType.Cut,
           setVisibility: this.props.setVisibility,
-          handleClick: e => this.CutHandler(e)
+          handleClick: () => this.CutHandler(),
         },
         {
           itemType: ContextMenuItemsType.Copy,
           setVisibility: this.props.setVisibility,
-          handleClick: e => this.CopyHandler(e)
+          handleClick: () => this.CopyHandler(),
         },
         {
           itemType: ContextMenuItemsType.Paste,
           setVisibility: this.props.setVisibility,
-          handleClick: e => this.PasteHandler(e)
+          handleClick: () => this.PasteHandler(),
         },
         {
           itemType: ContextMenuItemsType.PasteAndGo,
           setVisibility: this.props.setVisibility,
-          handleClick: e => this.PasteGoHandler(e)
+          handleClick: () => this.PasteGoHandler(),
         },
         {
           itemType: ContextMenuItemsType.Delete,
           setVisibility: this.props.setVisibility,
-          handleClick: e => this.DeleteHandler(e)
+          handleClick: () => this.DeleteHandler(),
         },
         {
           itemType: ContextMenuItemsType.Seperator,
           setVisibility: this.props.setVisibility,
-          handleClick: () => {}
+          handleClick: () => ({}),
         },
         {
           itemType: ContextMenuItemsType.SelectAll,
           setVisibility: this.props.setVisibility,
-          handleClick: e => this.SelectAllHandler(e)
-        }
-      ]
+          handleClick: () => this.SelectAllHandler(),
+        },
+      ],
     };
 
     this.setRef = this.setRef.bind(this);
@@ -59,12 +59,12 @@ class ContextMenu extends React.Component<IContextMenuProps, IContextMenu> {
   componentWillReceiveProps(nextProps: IContextMenuProps) {
     if (nextProps.position.x !== this.state.position.x || nextProps.position.y !== this.state.position.y) {
       this.setState({
-        position: nextProps.position
+        position: nextProps.position,
       });
     }
     if (nextProps.isVisible !== this.state.isVisible) {
       this.setState({
-        isVisible: nextProps.isVisible
+        isVisible: nextProps.isVisible,
       });
       this.manageMenuItemsStatus();
     }
@@ -79,19 +79,19 @@ class ContextMenu extends React.Component<IContextMenuProps, IContextMenu> {
   }
 
   async manageMenuItemsStatus() {
-    let _menuItems = [...this.state.menuItems];
+    const _menuItems = [...this.state.menuItems];
 
     // Cut
-    let cut = this.state.menuItems.find(x => x.itemType === ContextMenuItemsType.Cut);
-    let cutIndex = this.state.menuItems.findIndex(x => x.itemType === ContextMenuItemsType.Cut);
+    const cut = this.state.menuItems.find(x => x.itemType === ContextMenuItemsType.Cut);
+    const cutIndex = this.state.menuItems.findIndex(x => x.itemType === ContextMenuItemsType.Cut);
 
     // Copy
-    let copy = this.state.menuItems.find(x => x.itemType === ContextMenuItemsType.Copy);
-    let copyIndex = this.state.menuItems.findIndex(x => x.itemType === ContextMenuItemsType.Copy);
+    const copy = this.state.menuItems.find(x => x.itemType === ContextMenuItemsType.Copy);
+    const copyIndex = this.state.menuItems.findIndex(x => x.itemType === ContextMenuItemsType.Copy);
 
     // Delete
-    let deleteItem = this.state.menuItems.find(x => x.itemType === ContextMenuItemsType.Delete);
-    let deleteItemIndex = this.state.menuItems.findIndex(x => x.itemType === ContextMenuItemsType.Delete);
+    const deleteItem = this.state.menuItems.find(x => x.itemType === ContextMenuItemsType.Delete);
+    const deleteItemIndex = this.state.menuItems.findIndex(x => x.itemType === ContextMenuItemsType.Delete);
     if (window.getSelection() || {}.toString().length > 0) {
       if (cut) {
         _menuItems[cutIndex].isDisabled = false;
@@ -125,12 +125,12 @@ class ContextMenu extends React.Component<IContextMenuProps, IContextMenu> {
     }
 
     // Paste
-    let paste = this.state.menuItems.find(x => x.itemType === ContextMenuItemsType.Paste);
-    let pasteIndex = this.state.menuItems.findIndex(x => x.itemType === ContextMenuItemsType.Paste);
+    const paste = this.state.menuItems.find(x => x.itemType === ContextMenuItemsType.Paste);
+    const pasteIndex = this.state.menuItems.findIndex(x => x.itemType === ContextMenuItemsType.Paste);
 
     // Paste & Go
-    let pasteGo = this.state.menuItems.find(x => x.itemType === ContextMenuItemsType.PasteAndGo);
-    let pasteGoIndex = this.state.menuItems.findIndex(x => x.itemType === ContextMenuItemsType.PasteAndGo);
+    const pasteGo = this.state.menuItems.find(x => x.itemType === ContextMenuItemsType.PasteAndGo);
+    const pasteGoIndex = this.state.menuItems.findIndex(x => x.itemType === ContextMenuItemsType.PasteAndGo);
     if (this.props.onActionInvoked && (await this.props.onActionInvoked('readClipboard'))) {
       if (paste) {
         _menuItems[pasteIndex].isDisabled = false;
@@ -160,7 +160,7 @@ class ContextMenu extends React.Component<IContextMenuProps, IContextMenu> {
 
     const menuStyle = {
       left: this.state.position.x,
-      top: this.state.position.y
+      top: this.state.position.y,
     };
 
     return (
@@ -182,33 +182,33 @@ class ContextMenu extends React.Component<IContextMenuProps, IContextMenu> {
     }
   }
 
-  private async CutHandler(event: React.MouseEvent<HTMLLIElement>) {
+  private async CutHandler() {
     if (this.props.onActionInvoked && this.props.selectedUrlInput) {
       await this.props.onActionInvoked('writeClipboard', {
-        value: this.props.selectedUrlInput
+        value: this.props.selectedUrlInput,
       });
       this.props.setUrl('');
     }
   }
 
-  private async CopyHandler(event: React.MouseEvent<HTMLLIElement>) {
+  private async CopyHandler() {
     if (this.props.onActionInvoked && this.props.selectedUrlInput) {
       await this.props.onActionInvoked('writeClipboard', {
-        value: this.props.selectedUrlInput
+        value: this.props.selectedUrlInput,
       });
     }
   }
 
-  private async PasteHandler(event: React.MouseEvent<HTMLLIElement>) {
+  private async PasteHandler() {
     if (this.props.onActionInvoked) {
-      let value: string = await this.props.onActionInvoked('readClipboard');
+      const value: string = await this.props.onActionInvoked('readClipboard');
       if (value) this.props.setUrl(value);
     }
   }
 
-  private async PasteGoHandler(event: React.MouseEvent<HTMLLIElement>) {
+  private async PasteGoHandler() {
     if (this.props.onActionInvoked && this.props.enterUrl) {
-      let value: string = await this.props.onActionInvoked('readClipboard');
+      const value: string = await this.props.onActionInvoked('readClipboard');
       if (value) {
         this.props.setUrl(value);
         this.props.enterUrl();
@@ -216,13 +216,13 @@ class ContextMenu extends React.Component<IContextMenuProps, IContextMenu> {
     }
   }
 
-  private async DeleteHandler(event: React.MouseEvent<HTMLLIElement>) {
+  private async DeleteHandler() {
     if (this.props.selectedUrlInput) {
       this.props.setUrl('');
     }
   }
 
-  private async SelectAllHandler(event: React.MouseEvent<HTMLLIElement>) {
+  private async SelectAllHandler() {
     if (this.props.selectUrl) {
       this.props.selectUrl();
     }

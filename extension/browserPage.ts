@@ -2,8 +2,9 @@
 
 import { EventEmitter } from 'events';
 import Clipboard from './clipboard';
-var EventEmitterEnhancer = require('event-emitter-enhancer');
-var EnhancedEventEmitter = EventEmitterEnhancer.extend(EventEmitter);
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const EventEmitterEnhancer = require('event-emitter-enhancer');
+const EnhancedEventEmitter = EventEmitterEnhancer.extend(EventEmitter);
 
 export default class BrowserPage extends EnhancedEventEmitter {
   private client: any;

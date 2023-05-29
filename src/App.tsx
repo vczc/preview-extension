@@ -27,8 +27,8 @@ interface IState {
     canGoBack: boolean;
     canGoForward: boolean;
   };
-  scrollHeight: Number;
-  scrollWidth: Number;
+  scrollHeight: number;
+  scrollWidth: number;
 }
 
 interface IViewport {
@@ -97,14 +97,14 @@ class App extends React.Component<any, IState> {
     this.connection.enableVerboseLogging(this.state.isVerboseMode);
 
     // 当发生相同文档导航时触发，例如由于历史记录 API 使用或锚点导航
-    this.connection.on('Page.navigatedWithinDocument', (result: any) => {
+    this.connection.on('Page.navigatedWithinDocument', () => {
       this.requestNavigationHistory();
     });
 
     // 在帧导航完成后触发。帧现在与新加载程序关联
     this.connection.on('Page.frameNavigated', (result: any) => {
       const { frame } = result;
-      var isMainFrame = !frame.parentId;
+      const isMainFrame = !frame.parentId;
 
       if (isMainFrame) {
         this.requestNavigationHistory();
@@ -120,7 +120,7 @@ class App extends React.Component<any, IState> {
     });
 
     // 加载事件触发
-    this.connection.on('Page.loadEventFired', (result: any) => {
+    this.connection.on('Page.loadEventFired', () => {
       this.updateState({
         ...this.state,
         viewportMetadata: {
@@ -165,7 +165,7 @@ class App extends React.Component<any, IState> {
     });
 
     // 帧大小变化时
-    this.connection.on('Page.frameResized', (result: any) => {
+    this.connection.on('Page.frameResized', () => {
       this.stopCasting();
       this.startCasting();
     });
@@ -297,7 +297,7 @@ class App extends React.Component<any, IState> {
 
   // 开始适用截屏视频帧事件发送每个帧
   public startCasting() {
-    var params = {
+    const params = {
       quality: 100,
       format: this.state.format,
       maxWidth: 2000,
@@ -323,9 +323,9 @@ class App extends React.Component<any, IState> {
       return;
     }
 
-    let historyIndex = history.currentIndex;
-    let historyEntries = history.entries;
-    let currentEntry = historyEntries[historyIndex];
+    const historyIndex = history.currentIndex;
+    const historyEntries = history.entries;
+    const currentEntry = historyEntries[historyIndex];
     let url = currentEntry.url;
 
     const pattern = /^http:\/\/(.+)/;
@@ -343,7 +343,7 @@ class App extends React.Component<any, IState> {
       },
     });
 
-    let panelTitle = currentEntry.title || currentEntry.url;
+    const panelTitle = currentEntry.title || currentEntry.url;
 
     this.connection.send('extension.updateTitle', {
       title: `Tortie Preview (${panelTitle})`,
@@ -393,7 +393,7 @@ class App extends React.Component<any, IState> {
         this.handleInspectHighlightRequested(data);
         break;
       case 'inspectElement':
-        await this.handleInspectElementRequest(data);
+        await this.handleInspectElementRequest();
         this.handleToggleInspect();
         break;
       case 'hoverElementChanged':
@@ -405,12 +405,13 @@ class App extends React.Component<any, IState> {
 
       case 'size':
         console.log('app.onViewportChanged.size', data);
-        let newViewport = {} as any;
+        // eslint-disable-next-line no-case-declarations
+        const newViewport = {} as any;
         if (data.height !== undefined && data.width !== undefined) {
-          let height = Math.floor(data.height);
-          let width = Math.floor(data.width);
+          const height = Math.floor(data.height);
+          const width = Math.floor(data.width);
 
-          let devicePixelRatio = window.devicePixelRatio || 1;
+          const devicePixelRatio = window.devicePixelRatio || 1;
 
           this.connection.send('Page.setDeviceMetricsOverride', {
             deviceScaleFactor: devicePixelRatio,
@@ -458,7 +459,7 @@ class App extends React.Component<any, IState> {
 
   // 异步更新数据并执行副作用
   private async updateState(newState: any): Promise<void> {
-    return new Promise((resolve, reject) => {
+    return new Promise(resolve => {
       this.setState(newState, () => {
         this.sendStatetoHost();
         resolve();
@@ -468,7 +469,7 @@ class App extends React.Component<any, IState> {
 
   // 句柄检查突出显示请求
   private async handleInspectHighlightRequested(data: any) {
-    let highlightNodeInfo: any = await this.connection.send('DOM.getNodeForLocation', {
+    const highlightNodeInfo: any = await this.connection.send('DOM.getNodeForLocation', {
       x: data.params.position.x,
       y: data.params.position.y,
     });
@@ -524,17 +525,17 @@ class App extends React.Component<any, IState> {
       return;
     }
 
-    let nodeId = this.state.viewportMetadata.highlightNode.nodeId;
+    const nodeId = this.state.viewportMetadata.highlightNode.nodeId;
     const nodeDetails: any = await this.connection.send('DOM.resolveNode', {
       nodeId: nodeId,
     });
 
     if (nodeDetails.object) {
-      let objectId = nodeDetails.object.objectId;
-      let nodeProperties = await this.cdpHelper.resolveElementProperties(objectId, 3);
+      const objectId = nodeDetails.object.objectId;
+      const nodeProperties = await this.cdpHelper.resolveElementProperties(objectId, 3);
 
       if (nodeProperties) {
-        let sourceMetadata = getElementSourceMetadata(nodeProperties);
+        const sourceMetadata = getElementSourceMetadata(nodeProperties);
 
         if (!sourceMetadata.fileName) {
           return;
@@ -560,14 +561,14 @@ class App extends React.Component<any, IState> {
   }
 
   // 处理检查元素请求
-  private async handleInspectElementRequest(data: any) {
+  private async handleInspectElementRequest() {
     if (!this.state.viewportMetadata.highlightNode) {
       return;
     }
 
     await this.resolveHighlightNodeSourceMetadata();
 
-    let nodeId = this.state.viewportMetadata.highlightNode.nodeId;
+    const nodeId = this.state.viewportMetadata.highlightNode.nodeId;
 
     // Trigger CDP request to enable DOM explorer
     // TODO: No sure this works.
@@ -575,7 +576,7 @@ class App extends React.Component<any, IState> {
       nodeId: nodeId,
     });
 
-    let sourceMetadata = this.state.viewportMetadata.highlightNode.sourceMetadata;
+    const sourceMetadata = this.state.viewportMetadata.highlightNode.sourceMetadata;
 
     if (sourceMetadata) {
       this.connection.send('extension.openFile', {
@@ -630,12 +631,12 @@ class App extends React.Component<any, IState> {
 
   // 处理设备视口改变
   private handleViewportDeviceChange(data: any) {
-    let isResizable = data.device.name === 'Responsive';
-    let isFixedSize = data.device.name !== 'Responsive';
-    let isFixedZoom = data.device.name === 'Responsive';
-    let width = data.device.viewport ? data.device.viewport.width : undefined;
-    let height = data.device.viewport ? data.device.viewport.height : undefined;
-    let screenZoom = 1;
+    const isResizable = data.device.name === 'Responsive';
+    const isFixedSize = data.device.name !== 'Responsive';
+    const isFixedZoom = data.device.name === 'Responsive';
+    const width = data.device.viewport ? data.device.viewport.width : undefined;
+    const height = data.device.viewport ? data.device.viewport.height : undefined;
+    const screenZoom = 1;
 
     this.onViewportChanged('size', {
       emulatedDeviceId: data.device.name,
@@ -674,7 +675,7 @@ class App extends React.Component<any, IState> {
     });
   }
 
-  private enableViewportDeviceEmulation(deviceName: string = 'Responsive') {
+  private enableViewportDeviceEmulation(deviceName = 'Responsive') {
     console.log('app.enableViewportDeviceEmulation');
     this.handleViewportDeviceChange({
       device: {
@@ -706,7 +707,7 @@ class App extends React.Component<any, IState> {
       y: data.params.position.y,
     });
 
-    var cursor = await this.cdpHelper.getCursorForNode(nodeInfo);
+    const cursor = await this.cdpHelper.getCursorForNode(nodeInfo);
 
     this.setState({
       ...this.state,
@@ -720,8 +721,8 @@ class App extends React.Component<any, IState> {
   // 请求节点突出显示
   private async requestNodeHighlighting() {
     if (this.state.viewportMetadata.highlightNode) {
-      let nodeId = this.state.viewportMetadata.highlightNode.nodeId;
-      let highlightBoxModel: any = await this.connection.send('DOM.getBoxModel', {
+      const nodeId = this.state.viewportMetadata.highlightNode.nodeId;
+      const highlightBoxModel: any = await this.connection.send('DOM.getBoxModel', {
         nodeId: nodeId,
       });
 

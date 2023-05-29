@@ -4,8 +4,6 @@ export default class TargetTreeProvider implements vscode.TreeDataProvider<objec
   private _onDidChangeTreeData: vscode.EventEmitter<object | undefined> = new vscode.EventEmitter<object | undefined>();
   readonly onDidChangeTreeData: vscode.Event<object | undefined> = this._onDidChangeTreeData.event;
 
-  constructor() {}
-
   refresh(): void {
     this._onDidChangeTreeData.fire({});
   }
@@ -14,7 +12,7 @@ export default class TargetTreeProvider implements vscode.TreeDataProvider<objec
     return element;
   }
 
-  getChildren(element?: object): Thenable<object[]> {
+  getChildren(): Thenable<object[]> {
     vscode.commands.executeCommand('browser-preview.openPreview');
     vscode.commands.executeCommand('workbench.view.explorer');
 

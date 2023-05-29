@@ -1,5 +1,5 @@
 export default class Logger {
-  private enabled: boolean = true;
+  private enabled = true;
 
   public enable() {
     this.enabled = true;

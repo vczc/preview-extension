@@ -5,7 +5,6 @@
   "version": "1.0.0",
   "description": "This extension is deprecated in favor of the Live Preview extension.",
   "license": "MIT",
-  "type": "module",
   "author": {
     "email": "fokker_1102@163.com",
     "name": "vczc"
@@ -15,6 +14,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint --ext .ts,tsx . --fix ",
     "preview": "vite preview",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
@@ -38,7 +38,9 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.1",
     "glob": "^8.1.0",
+    "lint-staged": "^13.2.2",
     "mocha": "^10.2.0",
+    "prettier": "^2.8.8",
     "simple-git-hooks": "^2.8.1",
     "typescript": "^5.0.4",
     "vite": "^4.3.8"
@@ -259,7 +261,17 @@
     }
   },
   "simple-git-hooks": {
-    "commit-msg": "node scripts/verifyCommit.js"
+    "pre-commit": "npx lint-staged",
+    "commit-msg": "node scripts/verifyCommit.mjs"
+  },
+  "lint-staged": {
+    "*.{js,json}": [
+      "prettier --write"
+    ],
+    "*.ts?(x)": [
+      "eslint",
+      "prettier --parser=typescript --write"
+    ]
   },
   "repository": {
     "type": "git",

@@ -5,8 +5,6 @@ import { BrowserViewWindow } from './BrowserViewWindow';
 import { BrowserViewWindowManager } from './BrowserViewWindowManager';
 import { Telemetry } from './telemetry';
 import WorkSpaceUtil from './workspaceUtil';
-import path from 'path';
-import fs from 'fs';
 
 export function activate(context: vscode.ExtensionContext) {
   const telemetry = new Telemetry();

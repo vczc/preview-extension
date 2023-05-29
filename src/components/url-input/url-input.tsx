@@ -31,8 +31,8 @@ class UrlInput extends React.Component<any, IUrlInputState> {
         enterUrl: this.enterUrl.bind(this),
         selectUrl: this.selectUrl.bind(this),
         onActionInvoked: this.props.onActionInvoked,
-        selectedUrlInput: ''
-      }
+        selectedUrlInput: '',
+      },
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -47,7 +47,7 @@ class UrlInput extends React.Component<any, IUrlInputState> {
   componentWillReceiveProps(nextProps: any) {
     if (nextProps.url !== this.state.url && !this.state.hasChanged) {
       this.setState({
-        url: nextProps.url
+        url: nextProps.url,
       });
     }
   }
@@ -57,8 +57,8 @@ class UrlInput extends React.Component<any, IUrlInputState> {
     this.setState({
       contextMenuProps: {
         ...this.state.contextMenuProps,
-        isVisible: value
-      }
+        isVisible: value,
+      },
     });
   }
 
@@ -68,18 +68,18 @@ class UrlInput extends React.Component<any, IUrlInputState> {
     // only modify that part of the url
     let newCursorPosition: number | null = null;
     if (this.state.urlSelectionStart && this.state.urlSelectionEnd) {
-      let _url: string = this.state.url;
-      let firstPart: string = _url.slice(0, this.state.urlSelectionStart);
-      let secondPart: string = _url.slice(this.state.urlSelectionEnd);
+      const _url: string = this.state.url;
+      const firstPart: string = _url.slice(0, this.state.urlSelectionStart);
+      const secondPart: string = _url.slice(this.state.urlSelectionEnd);
 
       //set newCursorPosition
       newCursorPosition = (firstPart + value).length;
 
       value = firstPart + value + secondPart;
     } else if (this.state.urlSelectionStart) {
-      let _url: string = this.state.url;
-      let firstPart: string = _url.slice(0, this.state.urlSelectionStart);
-      let secondPart: string = _url.slice(this.state.urlSelectionStart);
+      const _url: string = this.state.url;
+      const firstPart: string = _url.slice(0, this.state.urlSelectionStart);
+      const secondPart: string = _url.slice(this.state.urlSelectionStart);
 
       //set newCursorPosition
       newCursorPosition = (firstPart + value).length;
@@ -91,7 +91,7 @@ class UrlInput extends React.Component<any, IUrlInputState> {
       this.setState({
         url: value,
         hasChanged: true,
-        isFocused: true
+        isFocused: true,
       });
 
       //set urlCursorPosition
@@ -132,7 +132,7 @@ class UrlInput extends React.Component<any, IUrlInputState> {
   private handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     this.setState({
       url: e.target.value,
-      hasChanged: true
+      hasChanged: true,
     });
   }
 
@@ -147,14 +147,14 @@ class UrlInput extends React.Component<any, IUrlInputState> {
     if (element) {
       element.select();
       this.setState({
-        isFocused: true
+        isFocused: true,
       });
     }
   }
 
-  private handleBlur(e: React.FocusEvent<HTMLInputElement>) {
+  private handleBlur() {
     this.setState({
-      isFocused: false
+      isFocused: false,
     });
   }
 
@@ -168,23 +168,23 @@ class UrlInput extends React.Component<any, IUrlInputState> {
         isVisible: true,
         position: {
           x: e.clientX,
-          y: e.clientY
+          y: e.clientY,
         },
-        selectedUrlInput: this.state.isFocused ? (window.getSelection() || '').toString() : ''
-      }
+        selectedUrlInput: this.state.isFocused ? (window.getSelection() || '').toString() : '',
+      },
     });
   }
 
   private enterUrl() {
     let url = this.state.url;
-    let schemeRegex = /^(https?|about|chrome|file):/;
+    const schemeRegex = /^(https?|about|chrome|file):/;
 
     if (!url.match(schemeRegex)) {
       url = 'http://' + this.state.url;
     }
 
     this.setState({
-      hasChanged: false
+      hasChanged: false,
     });
 
     this.props.onUrlChanged(url);

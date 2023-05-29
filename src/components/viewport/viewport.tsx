@@ -44,8 +44,8 @@ class Viewport extends React.Component<any, any> {
   public render() {
     this.viewportMetadata = this.props.viewport;
 
-    let width = this.viewportMetadata.width * this.viewportMetadata.screenZoom;
-    let height = this.viewportMetadata.height * this.viewportMetadata.screenZoom;
+    const width = this.viewportMetadata.width * this.viewportMetadata.screenZoom;
+    const height = this.viewportMetadata.height * this.viewportMetadata.screenZoom;
 
     let resizableEnableOptions = {
       top: false,
@@ -71,7 +71,7 @@ class Viewport extends React.Component<any, any> {
       };
     }
 
-    let renderer = (
+    const renderer = (
       <Screencast
         height={height - (this.props.scrollWidth > this.props.viewport.width ? 12 : 0)}
         width={width - (this.props.scrollHeight > this.props.viewport.height ? 12 : 0)}
@@ -111,7 +111,8 @@ class Viewport extends React.Component<any, any> {
             top: 'viewport-resizer resizer-top',
             topRight: 'viewport-resizer resizer-top-right',
             topLeft: 'viewport-resizer resizer-top-left',
-          }}>
+          }}
+        >
           {renderer}
         </Resizable>
       </div>

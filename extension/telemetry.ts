@@ -1,4 +1,4 @@
-var Mixpanel = require('mixpanel');
+import Mixpanel from 'mixpanel';
 import * as vscode from 'vscode';
 import * as os from 'os';
 import { uuid } from './uuid';
@@ -31,8 +31,8 @@ export class Telemetry {
 
     this.client = Mixpanel.init('d0149f7b700b44a18fa53e2cab03b564');
 
-    let extension = vscode.extensions.getExtension('toolchain.tortie-preview');
-    let extensionVersion = extension ? extension.packageJSON.version : '<none>';
+    const extension = vscode.extensions.getExtension('toolchain.tortie-preview');
+    const extensionVersion = extension ? extension.packageJSON.version : '<none>';
 
     // Store
     this.ip = uuid();
@@ -53,7 +53,7 @@ export class Telemetry {
       return;
     }
 
-    let data = {
+    const data = {
       ...params,
       distinct_id: this.userId,
       ip: this.ip,
@@ -63,14 +63,14 @@ export class Telemetry {
     this.client.track(eventName, data);
   }
 
-  configurationChanged(e: vscode.ConfigurationChangeEvent) {
+  configurationChanged() {
     this.getSettingFromConfig();
   }
 
   private getSettingFromConfig() {
-    let config = vscode.workspace.getConfiguration('telemetry');
+    const config = vscode.workspace.getConfiguration('telemetry');
     if (config) {
-      let enableTelemetry = config.get<boolean>('enableTelemetry');
+      const enableTelemetry = config.get<boolean>('enableTelemetry');
       this.isTelemetryEnabled = !!enableTelemetry;
     }
     if (this.isTelemetryEnabled) {

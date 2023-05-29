@@ -1,4 +1,3 @@
-import * as path from 'path';
 import * as vscode from 'vscode';
 import * as EventEmitter from 'eventemitter2';
 
@@ -43,7 +42,7 @@ export class BrowserViewWindow extends EventEmitter.EventEmitter2 {
       // @ts-ignore
       vscode.window.showErrorMessage(err.message);
     }
-    let showOptions = {
+    const showOptions = {
       viewColumn: vscode.ViewColumn.Beside,
     };
     this._panel = vscode.window.createWebviewPanel(BrowserViewWindow.viewType, 'Tortie Preview', showOptions, {
@@ -161,7 +160,7 @@ export class BrowserViewWindow extends EventEmitter.EventEmitter2 {
   }
 
   public setViewport(viewport: any) {
-    this._panel!.webview.postMessage({
+    this._panel?.webview.postMessage({
       method: 'extension.viewport',
       result: viewport,
     });
@@ -192,18 +191,18 @@ export class BrowserViewWindow extends EventEmitter.EventEmitter2 {
   }
 
   private handleOpenFileRequest(params: any) {
-    let lineNumber = params.lineNumber;
-    let columnNumber = params.columnNumber | params.charNumber | 0;
+    const lineNumber = params.lineNumber;
+    const columnNumber = params.columnNumber | params.charNumber | 0;
 
-    let workspacePath = (vscode.workspace.rootPath || '') + '/';
-    let relativePath = params.fileName.replace(workspacePath, '');
+    const workspacePath = (vscode.workspace.rootPath || '') + '/';
+    const relativePath = params.fileName.replace(workspacePath, '');
 
     vscode.workspace.findFiles(relativePath, '', 1).then(file => {
       if (!file || !file.length) {
         return;
       }
 
-      var firstFile = file[0];
+      const firstFile = file[0];
 
       // Open document
       vscode.workspace.openTextDocument(firstFile).then(
@@ -213,7 +212,7 @@ export class BrowserViewWindow extends EventEmitter.EventEmitter2 {
             document => {
               if (lineNumber) {
                 // Adjust line position from 1 to zero-based.
-                let pos = new vscode.Position(-1 + lineNumber, columnNumber);
+                const pos = new vscode.Position(-1 + lineNumber, columnNumber);
                 document.selection = new vscode.Selection(pos, pos);
               }
             },

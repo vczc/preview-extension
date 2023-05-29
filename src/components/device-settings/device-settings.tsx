@@ -40,10 +40,10 @@ class DeviceSettings extends React.Component<any, any> {
   public render() {
     this.viewportMetadata = this.props.viewportMetadata;
 
-    let selectedDevice = this.viewportMetadata.emulatedDeviceId || '';
+    const selectedDevice = this.viewportMetadata.emulatedDeviceId || '';
 
-    let procentageZoom = Math.round(this.viewportMetadata.screenZoom * 100);
-    let zoomLevels = [
+    const procentageZoom = Math.round(this.viewportMetadata.screenZoom * 100);
+    const zoomLevels = [
       { label: `Fit (${procentageZoom}%)`, value: 'fit' },
       // { label: '50%', value: '0.5' },
       // { label: '75%', value: '0.75' },
@@ -52,8 +52,8 @@ class DeviceSettings extends React.Component<any, any> {
       // { label: '150%', value: '1.50' }
     ];
 
-    let viewportHeight = this.viewportMetadata.height | 0;
-    let viewportWidth = this.viewportMetadata.width | 0;
+    const viewportHeight = this.viewportMetadata.height | 0;
+    const viewportWidth = this.viewportMetadata.width | 0;
 
     console.log(this.viewportMetadata, selectedDevice);
 
@@ -89,14 +89,14 @@ class DeviceSettings extends React.Component<any, any> {
   }
 
   private handleDeviceChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    let deviceName = e.target.value;
-    let device = this.emulatedDevices.find((d: any) => d.name == deviceName);
+    const deviceName = e.target.value;
+    const device = this.emulatedDevices.find((d: any) => d.name == deviceName);
 
     this.props.onDeviceChange(device);
   }
 
   private handleHeightChange(e: React.ChangeEvent<HTMLInputElement>) {
-    var newVal = parseInt(e.target.value);
+    const newVal = parseInt(e.target.value);
 
     this.props.onViewportSizeChange({
       height: newVal,
@@ -105,7 +105,7 @@ class DeviceSettings extends React.Component<any, any> {
   }
 
   private handleWidthChange(e: React.ChangeEvent<HTMLInputElement>) {
-    var newVal = parseInt(e.target.value);
+    const newVal = parseInt(e.target.value);
 
     this.props.onViewportSizeChange({
       width: newVal,
@@ -113,7 +113,7 @@ class DeviceSettings extends React.Component<any, any> {
     });
   }
 
-  private handleZoomChange(e: React.ChangeEvent<HTMLSelectElement>) {
+  private handleZoomChange() {
     console.log('not implemented');
   }
 }
