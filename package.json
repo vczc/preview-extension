@@ -2,15 +2,16 @@
   "name": "Tortie-preview",
   "displayName": "[Tortie] Tortie Preview",
   "publisher": "toolchain",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "This extension is deprecated in favor of the Live Preview extension.",
   "license": "MIT",
-  "icon": "logo.png",
+  "type": "module",
+  "author": {
+    "email": "fokker_1102@163.com",
+    "name": "vczc"
+  },
   "main": "./build/extension.js",
   "scripts": {
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "pnpm run compile && pnpm run lint",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -18,10 +19,11 @@
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "esbuild-base": "esbuild ./extension/extension.ts --bundle --outfile=build/extension.js --external:vscode --format=cjs --platform=node --sourcemap",
-    "vscode:prepublish": "npm run esbuild-base -- --minify && npm run build"
+    "vscode:prepublish": "npm run esbuild && npm run build"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
+    "@types/lodash": "^4.14.195",
     "@types/mocha": "^10.0.1",
     "@types/node": "~16.18.32",
     "@types/react": "^18.2.7",
@@ -31,17 +33,35 @@
     "@typescript-eslint/parser": "^5.56.0",
     "@vitejs/plugin-react": "^4.0.0",
     "@vscode/test-electron": "^2.3.0",
+    "chalk": "^5.2.0",
     "eslint": "^8.36.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.1",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
+    "simple-git-hooks": "^2.8.1",
     "typescript": "^5.0.4",
     "vite": "^4.3.8"
   },
   "dependencies": {
+    "@chiragrupani/karma-chromium-edge-launcher": "^2.3.1",
+    "amplitude": "^6.0.0",
+    "browser-viewport-device-descriptions": "^1.1.0",
+    "child_process": "^1.0.2",
+    "comment-json": "^4.2.3",
+    "element-to-source": "^1.0.1",
+    "event-emitter-enhancer": "^2.0.0",
+    "eventemitter2": "^5.0.1",
+    "get-port": "^6.1.2",
+    "karma-chrome-launcher": "^3.2.0",
+    "lodash": "^4.17.21",
+    "mixpanel": "^0.17.0",
+    "puppeteer-core": "^1.11.0",
+    "re-resizable": "^4.11.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "uuid": "^3.3.2",
+    "vsls": "^1.0.4753"
   },
   "activationEvents": [],
   "contributes": {
@@ -216,7 +236,7 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "icon": "resources/icon.svg",
+          "icon": "public/logo.png",
           "id": "browser-preview",
           "title": "Tortie Preview"
         }
@@ -237,6 +257,9 @@
         }
       ]
     }
+  },
+  "simple-git-hooks": {
+    "commit-msg": "node scripts/verifyCommit.js"
   },
   "repository": {
     "type": "git",

@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
-    "outDir": "dist",
-    "sourceMap": true,
     "target": "ESNext",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "module": "ESNext",
+    "sourceMap": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "skipLibCheck": true,
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
@@ -13,10 +12,12 @@
     "isolatedModules": false,
     "noEmit": true,
     "jsx": "react-jsx",
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "strict": true
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "baseUrl": "./",
+    "typeRoots": ["node_modules/@types", "types/*.d.ts"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "extensions/**/*.ts"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "extension/**/*.ts", "types/index.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

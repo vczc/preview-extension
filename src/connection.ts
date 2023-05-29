@@ -1,0 +1,81 @@
+import Logger from './utils/logger';
+import eventemitter2 from 'eventemitter2';
+
+export default class Connection extends eventemitter2.EventEmitter2 {
+  private lastId: number;
+  private vscode: any;
+  private callbacks: Map<number, object>;
+  private logger: Logger;
+
+  constructor() {
+    super();
+    this.lastId = 0;
+    this.callbacks = new Map();
+    this.logger = new Logger();
+
+    window.addEventListener('message', event => {
+      this.onMessage(event);
+    });
+  }
+
+  // 通过vscode调用chrome开发工具协议api    链接： https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-startScreencast
+  send<T>(method: string, params = {}): Promise<T> {
+    const id = ++this.lastId;
+
+    this.logger.log('SEND ► ', method, params);
+
+    if (!this.vscode) {
+      try {
+        // @ts-ignore
+        this.vscode = acquireVsCodeApi();
+      } catch {
+        this.vscode = null;
+      }
+    }
+
+    if (this.vscode) {
+      this.vscode.postMessage({
+        callbackId: id,
+        params,
+        type: method,
+      });
+    }
+
+    return new Promise((resolve, reject) => {
+      this.callbacks.set(id, { resolve, reject, error: new Error(), method });
+    });
+  }
+
+  // 打印消息or传递消息
+  onMessage(message: any) {
+    const object: any = message.data;
+
+    if (object) {
+      if (object.callbackId) {
+        this.logger.log(`◀ RECV callbackId: ${object.callbackId}`);
+        const callback: any = this.callbacks.get(object.callbackId);
+        // Callbacks could be all rejected if someone has called `.dispose()`.
+        if (callback) {
+          this.callbacks.delete(object.callbackId);
+          if (object.error) {
+            callback.reject(object.error, callback.method, object);
+          } else {
+            callback.resolve(object.result);
+          }
+        }
+      } else {
+        this.logger.log(`◀ RECV method: ${object.method}`);
+        this.emit(object.method, object.result);
+      }
+    }
+  }
+
+  // 是否启用详细日志记录
+  enableVerboseLogging(verbose: boolean) {
+    if (verbose) {
+      this.logger.enable();
+    } else {
+      this.logger.disable();
+    }
+  }
+}

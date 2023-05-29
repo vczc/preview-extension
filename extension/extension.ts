@@ -1,32 +1,46 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
-import * as vscode from "vscode";
+import * as vscode from 'vscode';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+import TargetTreeProvider from './targetTreeProvider';
+import { BrowserViewWindow } from './BrowserViewWindow';
+import { BrowserViewWindowManager } from './BrowserViewWindowManager';
+import { Telemetry } from './telemetry';
+import WorkSpaceUtil from './workspaceUtil';
+import path from 'path';
+import fs from 'fs';
+
 export function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log(
-    'Congratulations, your extension "vscode-tortie-preview" is now active!'
+  const telemetry = new Telemetry();
+
+  const windowManager = new BrowserViewWindowManager();
+
+  telemetry.sendEvent('activate');
+
+  vscode.window.registerTreeDataProvider('targetTree', new TargetTreeProvider());
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand('browser-preview.openPreview', (url?) => {
+      BrowserViewWindow.getContext(context);
+      createWebview(url);
+    })
   );
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand(
-    "vscode-tortie-preview.helloWorld",
-    () => {
-      // The code you place here will be executed every time your command is executed
-      // Display a message box to the user
-      vscode.window.showInformationMessage(
-        "Hello World from vscode-tortie-preview!"
-      );
+  function createWebview(url?: any) {
+    if (url != null && url instanceof vscode.Uri && url.scheme === 'file') {
+      url = url.toString();
     }
-  );
 
-  context.subscriptions.push(disposable);
+    const schemeRegex = /^(https?|about|chrome|file):/;
+
+    if (url && !url.match(schemeRegex)) {
+      url = 'http://' + url;
+    }
+
+    telemetry.sendEvent('openPreview');
+    windowManager.create(url);
+    WorkSpaceUtil.initFixedDprConfig();
+  }
+
+  return {
+    createWebview,
+  };
 }
-
-// This method is called when your extension is deactivated
-export function deactivate() {}
