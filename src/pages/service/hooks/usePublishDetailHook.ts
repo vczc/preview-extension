@@ -49,7 +49,7 @@ export function usePublishDetailHook() {
             delete obj.options
           }
         })
-        if (obj.type == 'select') {
+        if (obj.type === 'select') {
           obj.children = []
         } else {
           obj.children = formatteData(data[key])
@@ -70,8 +70,8 @@ export function usePublishDetailHook() {
       field_name: fieldName
     })
     if (_details.code === 200) {
-      const transformData = formatteData(_details.data.input)
-      _details.data.transformData = transformData
+      const transformData = formatteData(_details!.data!.input)
+      _details!.data!.transformData = transformData
       console.log('转换后的', _details.data)
       servicesStore.setTopicDetail(fieldName, _details.data)
     }

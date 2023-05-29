@@ -146,13 +146,16 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useServicesStore } from '../stores/services'
 import { ElMessage } from 'element-plus'
 import { DArrowRight, RemoveFilled, Plus } from '@element-plus/icons-vue'
 import { envInit, getAppInfo, start, commit } from '../services/serviceCheck'
 import { useTopicHook } from '../hooks/useTopicHook'
 import type { AppInfo, PublishTableItem, StartParams } from '../services/service'
+import { useAppInstanceHook } from '../hooks/useAppInstance'
+
+const [appInstance] = useAppInstanceHook()
 
 const topicData = ref<PublishTableItem[]>([])
 // fake data from backend
@@ -211,27 +214,43 @@ const addForm = (row: PublishTableItem) => {
   row.children = row.children ? [...row.children, ...row.newOption] : [...row.newOption]
 }
 
-const { fields, selectTableRef, changeSelect, addRecord, removeRecord, removeMultiple } =
+
+const { fields, selectTableRef, initData, changeSelect, addRecord, removeRecord, removeMultiple } =
   useTopicHook()
 
 // all the form data save in the pinia store
 const serviceStore = useServicesStore()
 
+onMounted(() => {
+  window.addEventListener('message', async (event) => { // 前端页面接收主进程发来的消息
+    if (event.data.id === 'changePath') {
+      console.log('接收到了sudo后的回调', event);
+      serviceStore.form.arxml = event.data.path
+
+      const _initRes = await envInit({
+        env_root_path: '/home/zeekr/vscode',
+        arxml_file_path: event.data.path || '/home/a/work/soa/new_tool/svt/backend/files/arxml/ZSDB222400_ChargeService_1_P_PropulsionASWC_CSCBCACore.arxml'
+      })
+      if (_initRes.code === 200) {
+        const _appInfo = await getAppInfo({ appname: '' })
+        if (_appInfo.code === 200) {
+          tableData.value = [_appInfo.data as AppInfo]
+          initData()
+        }
+      }
+    }
+  })
+})
 // table data
 const tableData = ref<AppInfo[]>([])
 // select a path use vscode api
 const selectFilePath = async () => {
   // serviceStore.form.arxml = '/asdf'
-  const _initRes = await envInit({
-    env_root_path: '/home/zeekr/vscode',
-    arxml_file_path: serviceStore.form.arxml || '/home/a/work/soa/new_tool/svt/backend/files/arxml/ZSDB222400_ChargeService_1_P_PropulsionASWC_CSCBCACore.arxml'
-  })
-  if (_initRes.code === 200) {
-    const _appInfo = await getAppInfo({ appname: '' })
-    if (_appInfo.code === 200) {
-      tableData.value = [_appInfo.data as AppInfo]
-    }
-  }
+  appInstance.$vscode.postMessage({ 
+    id: 'vscode:dialog', 
+    path: ''
+  }, '*');
+
 }
 
 const stopAction = async () => {

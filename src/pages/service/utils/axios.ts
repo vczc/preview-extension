@@ -3,7 +3,7 @@ import type { AxiosRequestConfig } from 'axios';
 
 const instance = axios.create({
   // baseURL: 'http://localhost:5173/api',
-  baseURL: 'http://127.0.0.1:9090',
+  baseURL: 'http://localhost:5173/api',
   // baseURL: 'http://10.114.148.55:9090',
   timeout: 40000,
   headers: {}

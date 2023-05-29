@@ -5,16 +5,11 @@
 	"tasks": [
 		{
 			"type": "npm",
-			"script": "watch",
-			"problemMatcher": "$tsc-watch",
-			"isBackground": true,
-			"presentation": {
-				"reveal": "never"
-			},
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
+			"script": "esbuild-base",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: esbuild-base",
+			"detail": "esbuild ./src-extension/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --sourcemap"
 		}
 	]
 }

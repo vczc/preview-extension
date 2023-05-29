@@ -54,7 +54,7 @@ export function useTopicHook() {
       _fields!.data!.forEach(async (item) => {
         // init selecter details
         // TODO: 记得打开下面注释
-        // initDetail(item)
+        initDetail(item)
       })
     }
   }
@@ -63,7 +63,7 @@ export function useTopicHook() {
   const changeSelect = (val: string) => {
     console.log('当前选项val', val)
     fields.fieldsSource = fields.fieldsSource.map((i) => {
-      i.selected = val == i.value
+      i.selected = val === i.value
       return i
     })
   }
@@ -81,7 +81,9 @@ export function useTopicHook() {
   const removeRecord = (row: any, index: number) => {
     // 1. reset selecter options setting
     fields.fieldsSource = fields.fieldsSource.map((_) => {
-      if (row.value === row.value) _.selected = false
+      if (row.value === row.value) {
+        _.selected = false
+      }
       return _;
     });
     // 2. remove table data
@@ -91,6 +93,7 @@ export function useTopicHook() {
   return {
     fields,
     selectTableRef,
+    initData,
     changeSelect,
     addRecord,
     removeRecord,

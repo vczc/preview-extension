@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="11px" viewBox="0 0 16 11" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/14/GDB</title>
+    <g id="页面-" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="明色1" transform="translate(-55.000000, -423.000000)">
+            <g id="编译调试工具" transform="translate(0.000000, 208.000000)">
+                <g id="关闭备份-4" transform="translate(0.000000, 200.000000)">
+                    <g id="icon/14/GDB" transform="translate(56.000000, 13.000000)">
+                        <rect id="矩形" x="0" y="0" width="14" height="14"></rect>
+                        <g id="编组-5">
+                            <polyline id="路径-2" stroke="#333333" stroke-linecap="round" stroke-linejoin="round" points="5 2 -1.69948691e-16 7.01290963 5 12"></polyline>
+                            <polyline id="路径-2备份" stroke="#333333" stroke-linecap="round" stroke-linejoin="round" transform="translate(11.500000, 7.000000) scale(-1, 1) translate(-11.500000, -7.000000) " points="14 2 9 7.01290963 14 12"></polyline>
+                            <text id="G" font-family="PingFangSC-Medium, PingFang SC" font-size="6" font-weight="400" fill="#D5D3D4">
+                                <tspan x="5" y="9">G</tspan>
+                            </text>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
