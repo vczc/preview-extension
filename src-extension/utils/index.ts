@@ -40,8 +40,8 @@ export const isProd = () => {
 
 // check the skd path has its value
 export const checkSDKPath = () => {
-    let config = vscode.workspace.getConfiguration().get(SDK_PATH_NAME);
-    return !!config
+    let config: string = vscode.workspace.getConfiguration().get(SDK_PATH_NAME) || '';
+    return (config && fs.existsSync(path.join(config, "sdk_build.sh")))
 }
 
 // check the skd path has sdk_buil.sh file 

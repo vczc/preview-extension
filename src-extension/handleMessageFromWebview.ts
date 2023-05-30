@@ -2,8 +2,8 @@ import * as vscode from 'vscode'
 import * as path from 'path'
 import * as sudo from 'sudo-prompt'
 import { getState, saveState } from './utils/common';
-import { PAGE_DATAS_KEY } from './constants/config';
-import { infoMsg } from './utils';
+import { PAGE_DATAS_KEY, SDK_PATH_NAME } from './constants/config';
+import { checkSDKPath, errorMsg, infoMsg, warningMsg } from './utils';
 
 //处理接受数据
 export function receiveMessageFromWebview(pannel: vscode.WebviewPanel, context: vscode.ExtensionContext) {
@@ -11,7 +11,6 @@ export function receiveMessageFromWebview(pannel: vscode.WebviewPanel, context: 
     const evName = e.id
 
     if (evName === "vscode:message save-buildConfig") {
-      e.build_data = JSON.parse(e.data);
       let pageDataMap = getState(context, PAGE_DATAS_KEY) || {}
       pageDataMap[e.pageId] = e.data
       saveState(context, PAGE_DATAS_KEY, pageDataMap)
@@ -19,28 +18,29 @@ export function receiveMessageFromWebview(pannel: vscode.WebviewPanel, context: 
     }
 
     if (evName === 'vscode:sudo') {
-      var options = {
+      const options = {
         name: 'VSCode',
         icns: '/Applications/Visual Studio Code.app/Contents/Resources/Code.icns', // (optional)
       };
-      const _path = path.resolve(process.env.VSCODE_CWD as string, 'src-extension/a.sh')
-      sudo.exec(_path, options,
-        function (error, stdout, stderr) {
-          if (error) {
-            console.log('出错了', error)
-            pannel.webview.postMessage({
-              id: "vscode:sudo:cb",
-              data: { message: error.message, stderr }
-            });
-          } else {
-            pannel.webview.postMessage({
-              id: "vscode:sudo:cb",
-              data: { message: stdout, }
-            });
-          }
-          console.log('stdout: ' + stdout);
-        }
-      );
+      initEnvironment(e, pannel)
+      // const _path = path.resolve(process.env.VSCODE_CWD as string, 'src-extension/a.sh')
+      // sudo.exec(_path, options,
+      //   function (error, stdout, stderr) {
+      //     if (error) {
+      //       console.log('出错了', error)
+      //       pannel.webview.postMessage({
+      //         id: "vscode:sudo:cb",
+      //         data: { message: error.message, stderr }
+      //       });
+      //     } else {
+      //       pannel.webview.postMessage({
+      //         id: "vscode:sudo:cb",
+      //         data: { message: stdout, }
+      //       });
+      //     }
+      //     console.log('stdout: ' + stdout);
+      //   }
+      // );
     }
 
     if (evName === "vscode:dialog") {
@@ -62,4 +62,59 @@ export function receiveMessageFromWebview(pannel: vscode.WebviewPanel, context: 
         });
     }
   });
+}
+
+
+async function initEnvironment(event: any, pannel: vscode.WebviewPanel) {
+  try {
+      if (!checkSDKPath()) {
+          warningMsg("请先配置Global Sdk Path !");
+          vscode.commands.executeCommand('workbench.action.openSettings', SDK_PATH_NAME);
+          return
+      }
+      const _sdkPath = vscode.workspace.getConfiguration().get(SDK_PATH_NAME)
+
+      const options = {
+          name: 'VSCode',
+          // icns: '/Applications/Visual Studio Code.app/Contents/Resources/Code.icns', // (optional)
+      };
+      // const stopSh = `${_sdkPath}/my_start_env.sh disable`
+      // const startSh = `${_sdkPath}/my_start_env.sh enable sdkpath ip mask`
+      const stopSh = `${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/env_init.sh disable`
+      const startSh = `${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/env_init.sh enable ${_sdkPath} ${event.version} ${event.ip_address} ${event.mask}`
+
+      sudo.exec(stopSh, options,
+          function (error, stdout, stderr) {
+            if (error) {
+              console.log('初始化停止出错了1', error)
+              errorMsg(`初始化出错了${error}`)
+            } else {
+              sudo.exec(startSh, options, (error, stdout, stderr) => {
+                  if (error) {
+                      console.log('启动初始化环境失败2', error)
+                      errorMsg(`启动初始化环境错误 ${error}`)
+                      pannel.webview.postMessage({
+                        id: "vscode:sudo:cb",
+                        data: { message: error.message, stderr, type: 'error' },
+                        sdkPath: _sdkPath
+                      });
+                  } else {
+                    pannel.webview.postMessage({
+                      id: "vscode:sudo:cb",
+                      data: {
+                        message: 'success', 
+                        type: 'success'
+                      },
+                      sdkPath: _sdkPath
+                    });
+                  }
+              })
+            }
+            console.log('stdout: ' + stdout);
+          }
+        );
+
+  } catch (error) {
+      console.log('初始化环境出错!')
+  }
 }

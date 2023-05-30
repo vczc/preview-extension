@@ -3,7 +3,7 @@ import * as path from 'path';
 import { ZopViewNode } from './zopCodeGenerateView';
 import { openWebview } from './webview';
 export let zopServiceDebugInstance: ZopServiceDebugTreeDataProvider | null = null;
-
+import { startServer, stopServer } from './serviceBackendServer';
 export class ZopServiceDebugTreeDataProvider implements vscode.TreeDataProvider<ZopViewNode> {
     private _onDidChangeTreeData: vscode.EventEmitter<ZopViewNode | undefined | null | void> = new vscode.EventEmitter<ZopViewNode | undefined | null | void>();
     readonly onDidChangeTreeData: vscode.Event<ZopViewNode | undefined | null  | void> = this._onDidChangeTreeData.event;
@@ -61,8 +61,13 @@ export function initServiceDebugView(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.window.registerTreeDataProvider('zopCheckDebugToolView', zopServiceDebugInstance));
     
     // 点击服务验证
-    context.subscriptions.push(vscode.commands.registerCommand("serviceCheck.click", (node) => {
-        openWebview(context, node.id, `服务验证`, process.env.SERVICE_WEBVIEW, 'service.html');
+    context.subscriptions.push(vscode.commands.registerCommand("serviceCheck.click", async (node) => {
+        await startServer()
+        setTimeout(() => {
+            console.log('打开webview回调');
+            openWebview(context, node.id, `服务验证`, process.env.SERVICE_WEBVIEW, 'service.html', stopServer);
+        }, 2000);
+            
     }));
     
 }

@@ -55,7 +55,7 @@ const getHtmlContent = (
   }
 // };
 
-export const openWebview = (context: vscode.ExtensionContext, id: string, title: string = '网页标题', url="http://127.0.0.1:5173/build.html", htmlName: string='build.html') => {
+export const openWebview = async (context: vscode.ExtensionContext, id: string, title: string = '网页标题', url="http://127.0.0.1:5173/build.html", htmlName: string='build.html', disposeCb?: Function) => {
   const _currentWebview = webviewMap[id];
   if (!_currentWebview) {
     const panel = vscode.window.createWebviewPanel(
@@ -72,6 +72,7 @@ export const openWebview = (context: vscode.ExtensionContext, id: string, title:
     panel.onDidDispose(
       () => {
         webviewMap[id] = null;
+        disposeCb && disposeCb()
       },
       undefined,
       context.subscriptions

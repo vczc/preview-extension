@@ -103,6 +103,7 @@ onMounted(() => {
     if (event.data.id === 'vscode:sudo:cb') {
       console.log('接收到了sudo后的回调', event.data.data);
       showStrartTip.value = false
+      serviceStore.form.sdkPath = event.data.sdkPath
       router.push('/step2')
     }
   })
@@ -129,8 +130,10 @@ const onSubmit = () => {
     if (valid) {
       showStrartTip.value = true
       appInstance.$vscode.postMessage({ 
-        id: 'vscode:sudo', 
-        files: ['a.sh']
+        id: 'vscode:sudo',
+        ip_address: serviceStore.form.ip_address,
+        mask: serviceStore.form.mask,
+        version: serviceStore.form.version
       }, '*');
     }
   })

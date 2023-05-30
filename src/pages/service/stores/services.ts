@@ -9,12 +9,14 @@ export const useServicesStore = defineStore('services', {
       mask: '',
       arxml: '',
       service_clien_ip: '',
+      sdkPath: '',
       // version: 'V1.2.0',
       // platform_info: 'QNX',
       // ip_address: '172.17.0.2',
       // mask: '255.255.255.0',
       // service_clien_ip: '',
       // arxml: '/home/a/work/soa/new_tool/svt/backend/files/arxml/ZSDB222400_ChargeService_1_P_PropulsionASWC_CSCBCACore.arxml'
+      // sdkPath: '',
     },
     topicDetail: {
       // OnBdChrgrPwrEnaAllwdStatus: {

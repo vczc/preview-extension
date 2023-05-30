@@ -733,7 +733,7 @@ var require_package = __commonJS({
 // node_modules/dotenv/lib/main.js
 var require_main = __commonJS({
   "node_modules/dotenv/lib/main.js"(exports, module2) {
-    var fs3 = require("fs");
+    var fs4 = require("fs");
     var path9 = require("path");
     var os = require("os");
     var packageJson = require_package();
@@ -778,7 +778,7 @@ var require_main = __commonJS({
         }
       }
       try {
-        const parsed = DotenvModule.parse(fs3.readFileSync(dotenvPath, { encoding }));
+        const parsed = DotenvModule.parse(fs4.readFileSync(dotenvPath, { encoding }));
         Object.keys(parsed).forEach(function(key) {
           if (!Object.prototype.hasOwnProperty.call(process.env, key)) {
             process.env[key] = parsed[key];
@@ -829,7 +829,9 @@ var vscode5 = __toESM(require("vscode"));
 var path4 = __toESM(require("path"));
 
 // src-extension/utils/index.ts
+var fs = __toESM(require("fs"));
 var vscode = __toESM(require("vscode"));
+var path = __toESM(require("path"));
 
 // src-extension/constants/config.ts
 var SDK_PATH_NAME = "Zoks: Global SDK Path";
@@ -843,15 +845,21 @@ var infoMsg = (msg) => {
 var warningMsg = (msg) => {
   vscode.window.showWarningMessage(msg);
 };
+var errorMsg = (msg) => {
+  vscode.window.showErrorMessage(msg);
+};
+var checkSDKPath = () => {
+  let config2 = vscode.workspace.getConfiguration().get(SDK_PATH_NAME) || "";
+  return config2 && fs.existsSync(path.join(config2, "sdk_build.sh"));
+};
 
 // src-extension/webview.ts
 var vscode3 = __toESM(require("vscode"));
 var path2 = __toESM(require("path"));
-var fs = __toESM(require("fs"));
+var fs2 = __toESM(require("fs"));
 
 // src-extension/handleMessageFromWebview.ts
 var vscode2 = __toESM(require("vscode"));
-var path = __toESM(require("path"));
 var sudo = __toESM(require_sudo_prompt());
 
 // src-extension/utils/common.ts
@@ -868,41 +876,18 @@ function receiveMessageFromWebview(pannel, context) {
   pannel.webview.onDidReceiveMessage(function(e) {
     const evName = e.id;
     if (evName === "vscode:message save-buildConfig") {
-      console.log("\u4FDD\u5B58\u56DE\u4F20\u7684\u6570\u636E", e);
-      e.build_data = JSON.parse(e.data);
       let pageDataMap = getState(context, PAGE_DATAS_KEY) || {};
       pageDataMap[e.pageId] = e.data;
       saveState(context, PAGE_DATAS_KEY, pageDataMap);
       infoMsg("\u4FDD\u5B58\u914D\u7F6E\u6210\u529F");
     }
     if (evName === "vscode:sudo") {
-      console.log(e);
-      console.log(process.env);
-      var options = {
+      const options = {
         name: "VSCode",
         icns: "/Applications/Visual Studio Code.app/Contents/Resources/Code.icns"
         // (optional)
       };
-      const _path = path.resolve(process.env.VSCODE_CWD, "src-extension/a.sh");
-      sudo.exec(
-        _path,
-        options,
-        function(error, stdout, stderr) {
-          if (error) {
-            console.log("\u51FA\u9519\u4E86", error);
-            pannel.webview.postMessage({
-              id: "vscode:sudo:cb",
-              data: { message: error.message, stderr }
-            });
-          } else {
-            pannel.webview.postMessage({
-              id: "vscode:sudo:cb",
-              data: { message: stdout }
-            });
-          }
-          console.log("stdout: " + stdout);
-        }
-      );
+      initEnvironment(e, pannel);
     }
     if (evName === "vscode:dialog") {
       vscode2.window.showOpenDialog({
@@ -923,13 +908,62 @@ function receiveMessageFromWebview(pannel, context) {
     }
   });
 }
+async function initEnvironment(event, pannel) {
+  try {
+    if (!checkSDKPath()) {
+      warningMsg("\u8BF7\u5148\u914D\u7F6EGlobal Sdk Path !");
+      vscode2.commands.executeCommand("workbench.action.openSettings", SDK_PATH_NAME);
+      return;
+    }
+    const _sdkPath = vscode2.workspace.getConfiguration().get(SDK_PATH_NAME);
+    const options = {
+      name: "VSCode"
+      // icns: '/Applications/Visual Studio Code.app/Contents/Resources/Code.icns', // (optional)
+    };
+    const stopSh = `${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/env_init.sh disable`;
+    const startSh = `${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/env_init.sh enable ${_sdkPath} ${event.version} ${event.ip_address} ${event.mask}`;
+    sudo.exec(
+      stopSh,
+      options,
+      function(error, stdout, stderr) {
+        if (error) {
+          console.log("\u521D\u59CB\u5316\u505C\u6B62\u51FA\u9519\u4E861", error);
+          errorMsg(`\u521D\u59CB\u5316\u51FA\u9519\u4E86${error}`);
+        } else {
+          sudo.exec(startSh, options, (error2, stdout2, stderr2) => {
+            if (error2) {
+              console.log("\u542F\u52A8\u521D\u59CB\u5316\u73AF\u5883\u5931\u8D252", error2);
+              errorMsg(`\u542F\u52A8\u521D\u59CB\u5316\u73AF\u5883\u9519\u8BEF ${error2}`);
+              pannel.webview.postMessage({
+                id: "vscode:sudo:cb",
+                data: { message: error2.message, stderr: stderr2, type: "error" },
+                sdkPath: _sdkPath
+              });
+            } else {
+              pannel.webview.postMessage({
+                id: "vscode:sudo:cb",
+                data: {
+                  message: "success",
+                  type: "success"
+                },
+                sdkPath: _sdkPath
+              });
+            }
+          });
+        }
+        console.log("stdout: " + stdout);
+      }
+    );
+  } catch (error) {
+    console.log("\u521D\u59CB\u5316\u73AF\u5883\u51FA\u9519!");
+  }
+}
 
 // src-extension/webview.ts
 var webviewMap = {};
 var getHtmlContent = (context, panel, router, htmlName) => {
-  console.log("\u6784\u5EFA\u65F6\u5019\u5224\u65AD\u73AF\u5883\u4FE1\u606F1", process.env.ZKOS_SDK_PLUGIN_ENV);
   const htmlPath = path2.resolve(__dirname, `./web-build/${htmlName}`);
-  let html = fs.readFileSync(htmlPath, "utf-8");
+  let html = fs2.readFileSync(htmlPath, "utf-8");
   const webviewUri = (localFilePath) => {
     const resourceUri = vscode3.Uri.file(localFilePath);
     return panel.webview.asWebviewUri(resourceUri);
@@ -941,7 +975,7 @@ var getHtmlContent = (context, panel, router, htmlName) => {
   });
   return html;
 };
-var openWebview = (context, id, title = "\u7F51\u9875\u6807\u9898", url = "http://127.0.0.1:5173/build.html", htmlName = "build.html") => {
+var openWebview = async (context, id, title = "\u7F51\u9875\u6807\u9898", url = "http://127.0.0.1:5173/build.html", htmlName = "build.html", disposeCb) => {
   const _currentWebview = webviewMap[id];
   if (!_currentWebview) {
     const panel = vscode3.window.createWebviewPanel(
@@ -961,6 +995,7 @@ var openWebview = (context, id, title = "\u7F51\u9875\u6807\u9898", url = "http:
     panel.onDidDispose(
       () => {
         webviewMap[id] = null;
+        disposeCb && disposeCb();
       },
       void 0,
       context.subscriptions
@@ -976,7 +1011,7 @@ var openWebview = (context, id, title = "\u7F51\u9875\u6807\u9898", url = "http:
 
 // src-extension/initProject.ts
 var vscode4 = __toESM(require("vscode"));
-var fs2 = __toESM(require("fs"));
+var fs3 = __toESM(require("fs"));
 var path3 = __toESM(require("path"));
 var child_process = __toESM(require("child_process"));
 var buildPageData = null;
@@ -993,7 +1028,7 @@ var getPlatformsFromSh = async (context) => {
     warningMsg("\u8BF7\u5148\u914D\u7F6EGlobal Sdk Path !");
     vscode4.commands.executeCommand("workbench.action.openSettings", SDK_PATH_NAME);
     return false;
-  } else if (!fs2.existsSync(path3.join(config2, "sdk_build.sh"))) {
+  } else if (!fs3.existsSync(path3.join(config2, "sdk_build.sh"))) {
     warningMsg("sdk \u8DEF\u5F84\u4E0D\u6B63\u786E!");
     vscode4.commands.executeCommand("workbench.action.openSettings", SDK_PATH_NAME);
     return false;
@@ -1010,15 +1045,13 @@ var getPlatformsFromSh = async (context) => {
       execShellByChildProcess(cmd, platform, context);
       while (!buildPageData) {
         let fun = () => console.log("time out");
-        let sleep2 = (time) => new Promise((resolve4) => {
-          setTimeout(resolve4, time);
+        let sleep2 = (time) => new Promise((resolve3) => {
+          setTimeout(resolve3, time);
         });
         await sleep2(500).then(fun);
       }
-      console.log("\u8D70\u5230\u8FD9\u91CC\u5DF2\u7ECF\u8BBE\u7F6E\u4E0AglobalState\u4E86:::\u8FD4\u56DEtrue", buildPageData);
       return true;
     } else {
-      console.log("\u5B58\u5728\u7F13\u5B58\u6570\u636E\u76F4\u63A5\u8FD4\u56DEtrue");
       return true;
     }
   }
@@ -1081,7 +1114,6 @@ var execShellByChildProcess = (cmd, platform, context) => {
     });
     buildPageData = JSON.parse(jsonStr);
     saveState(context, BUILD_PAGE_INITDATA, buildPageData);
-    console.log("\u8BBE\u7F6EbuildPageData\u4E86:::", buildPageData);
   }
 };
 
@@ -1219,7 +1251,6 @@ var ZopCompileDebugTreeDataProvider = class {
     this.cacheTreeData();
     this.refresh();
     infoMsg(`\u65B0\u589E\u8282\u70B9: ${value} \u6210\u529F!`);
-    console.log(node);
   }
   refresh() {
     this._onDidChangeTreeData.fire();
@@ -1237,7 +1268,6 @@ function initCompileDebugView(context) {
   }));
   context.subscriptions.push(vscode5.commands.registerCommand("zopPlugin.renameNode", (node) => {
     vscode5.window.showInputBox({ prompt: "\u8BF7\u8F93\u5165\u65B0\u540D\u79F0" }).then((value) => {
-      console.log(node, value);
       if (value) {
         zopCompileDebugProviderInstance.renameSubNode(node, value);
       }
@@ -1249,14 +1279,13 @@ function initCompileDebugView(context) {
   context.subscriptions.push(vscode5.commands.registerCommand("zopPlugin.delCache", () => {
     zopCompileDebugProviderInstance.clearCacheTreeData();
     vscode5.window.showInformationMessage(`\u6E05\u7406\u6210\u529F!`);
-    console.log("\u6389\u5230\u4E86");
+    context.globalState.update(BUILD_PAGE_INITDATA, "");
+    context.globalState.update(PAGE_DATAS_KEY, "");
   }));
   context.subscriptions.push(vscode5.commands.registerCommand("Build_setting_click", async (node) => {
-    console.log("\u70B9\u51FB\u4E86Build_setting_click", node);
     if (await getPlatformsFromSh(context)) {
       const _buildPageInitData = getState(context, BUILD_PAGE_INITDATA);
       const _pageData = getState(context, PAGE_DATAS_KEY);
-      console.log("\u83B7\u53D6\u521D\u59CB\u5316\u6570\u636E", _buildPageInitData);
       const webviewPanel = openWebview(
         context,
         node.id,
@@ -1264,7 +1293,6 @@ function initCompileDebugView(context) {
         "http://localhost:5173/build.html/#/build-config",
         "build.html"
       );
-      console.log("webview\u5BF9\u8C61\u54C8\u54C8", webviewPanel);
       webviewPanel[node.id].webview.postMessage({
         id: "initdata",
         data: _buildPageInitData,
@@ -1285,7 +1313,6 @@ function initCompileDebugView(context) {
 // src-extension/registryCommanders.ts
 function registryCommanders_default(context) {
   context.subscriptions.push(vscode6.commands.registerCommand("view.refresh", (node) => {
-    console.log(node);
     switch (node.contextValue) {
       case "Build_setting":
         zopCompileDebugProviderInstance?.refresh();
@@ -1308,7 +1335,6 @@ var ZopCodeGenerateTreeDataProvider = class {
     __publicField(this, "_onDidChangeTreeData", new vscode7.EventEmitter());
     __publicField(this, "onDidChangeTreeData", this._onDidChangeTreeData.event);
     __publicField(this, "data");
-    console.log("\u6211\u662FzopCode");
     this.context = context;
     this.data = [
       {
@@ -1343,7 +1369,6 @@ function initZopCodeView(context) {
   zopCodeProviderInstance = new ZopCodeGenerateTreeDataProvider(context);
   context.subscriptions.push(vscode7.window.registerTreeDataProvider("zopCodeGenerate", zopCodeProviderInstance));
   context.subscriptions.push(vscode7.commands.registerCommand("toolChain.click", () => {
-    console.log("\u70B9\u51FB\u5DE5\u5177\u94FE");
     const mathExt = vscode7.extensions.getExtension("toolchain.Tortie-preview");
     const importedApi = mathExt.exports;
     const url = "https://www.baidu.com";
@@ -1384,7 +1409,6 @@ var ZopSettingViewTreeDataProvider = class {
         }
       ];
     }
-    console.log(this.data);
   }
   getTreeItem(element) {
     return element;
@@ -1401,19 +1425,65 @@ function initZopSettingView(context) {
   zopSettingViewInstance = new ZopSettingViewTreeDataProvider(context);
   context.subscriptions.push(vscode8.window.registerTreeDataProvider("zopSetting", zopSettingViewInstance));
   context.subscriptions.push(vscode8.commands.registerCommand("zopPlugin.openSetting", (node) => {
-    console.log("\u6253\u5F00\u8BBE\u7F6E");
     vscode8.commands.executeCommand("workbench.action.openSettings", "Zoks: Global SDK Path");
   }));
 }
 
 // src-extension/zopServiceDebugView.ts
-var vscode9 = __toESM(require("vscode"));
+var vscode10 = __toESM(require("vscode"));
 var path7 = __toESM(require("path"));
+
+// src-extension/serviceBackendServer.ts
+var vscode9 = __toESM(require("vscode"));
+var child_process2 = __toESM(require("child_process"));
+async function startServer() {
+  try {
+    if (!checkSDKPath()) {
+      warningMsg("\u8BF7\u5148\u914D\u7F6EGlobal Sdk Path !");
+      vscode9.commands.executeCommand("workbench.action.openSettings", SDK_PATH_NAME);
+      return;
+    }
+    const _sdkPath = vscode9.workspace.getConfiguration().get(SDK_PATH_NAME);
+    const cmd = `bash ${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/start_svt.sh start ${_sdkPath}`;
+    const childProcess = child_process2.spawn(cmd, [], { detached: true, shell: true });
+    childProcess.stdout.on("data", (data) => {
+      console.log(`\u547D\u4EE4\u8F93\u51FA: ${data}`);
+    });
+    childProcess.stderr.on("data", (data) => {
+      console.error(`\u547D\u4EE4\u9519\u8BEF\u8F93\u51FA: ${data}`);
+    });
+    childProcess.on("error", (error) => {
+      console.error(`\u6267\u884C\u547D\u4EE4\u51FA\u9519: ${error}`);
+    });
+    childProcess.on("close", (code) => {
+      console.log(`\u547D\u4EE4\u9000\u51FA\uFF0C\u9000\u51FA\u7801: ${code}`);
+    });
+    console.log("\u62C9\u8D77\u670D\u52A1");
+  } catch (error) {
+    console.log("\u62C9\u8D77\u670D\u52A1\u9A8C\u8BC1\u540E\u7AEF\u670D\u52A1\u5931\u8D25!");
+  }
+}
+async function stopServer() {
+  try {
+    if (!checkSDKPath()) {
+      warningMsg("\u8BF7\u5148\u914D\u7F6EGlobal Sdk Path !");
+      vscode9.commands.executeCommand("workbench.action.openSettings", SDK_PATH_NAME);
+      return;
+    }
+    const _sdkPath = vscode9.workspace.getConfiguration().get(SDK_PATH_NAME);
+    child_process2.execSync(`${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/start_svt.sh stop `).toString();
+    console.log("\u505C\u6B62\u670D\u52A1");
+  } catch (error) {
+    console.log("\u505C\u6B62\u670D\u52A1\u9A8C\u8BC1\u540E\u7AEF\u670D\u52A1\u5931\u8D25!");
+  }
+}
+
+// src-extension/zopServiceDebugView.ts
 var zopServiceDebugInstance = null;
 var ZopServiceDebugTreeDataProvider = class {
   constructor(context) {
     this.context = context;
-    __publicField(this, "_onDidChangeTreeData", new vscode9.EventEmitter());
+    __publicField(this, "_onDidChangeTreeData", new vscode10.EventEmitter());
     __publicField(this, "onDidChangeTreeData", this._onDidChangeTreeData.event);
     __publicField(this, "data");
     this.context = context;
@@ -1430,7 +1500,7 @@ var ZopServiceDebugTreeDataProvider = class {
           dark: path7.join(__dirname, "..", "images/dark/dark_service.svg")
         },
         children: [],
-        collapsibleState: vscode9.TreeItemCollapsibleState.None,
+        collapsibleState: vscode10.TreeItemCollapsibleState.None,
         command: {
           title: "\u670D\u52A1\u9A8C\u8BC1",
           command: `serviceCheck.click`,
@@ -1456,9 +1526,13 @@ var ZopServiceDebugTreeDataProvider = class {
 };
 function initServiceDebugView(context) {
   zopServiceDebugInstance = new ZopServiceDebugTreeDataProvider(context);
-  context.subscriptions.push(vscode9.window.registerTreeDataProvider("zopCheckDebugToolView", zopServiceDebugInstance));
-  context.subscriptions.push(vscode9.commands.registerCommand("serviceCheck.click", (node) => {
-    openWebview(context, node.id, `\u670D\u52A1\u9A8C\u8BC1`, process.env.SERVICE_WEBVIEW, "service.html");
+  context.subscriptions.push(vscode10.window.registerTreeDataProvider("zopCheckDebugToolView", zopServiceDebugInstance));
+  context.subscriptions.push(vscode10.commands.registerCommand("serviceCheck.click", async (node) => {
+    await startServer();
+    setTimeout(() => {
+      console.log("\u6253\u5F00webview\u56DE\u8C03");
+      openWebview(context, node.id, `\u670D\u52A1\u9A8C\u8BC1`, process.env.SERVICE_WEBVIEW, "service.html", stopServer);
+    }, 2e3);
   }));
 }
 

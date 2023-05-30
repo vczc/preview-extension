@@ -187,7 +187,7 @@ export function initCompileDebugView(context: vscode.ExtensionContext) {
         if(await getPlatformsFromSh(context)) {
             const _buildPageInitData = getState(context, BUILD_PAGE_INITDATA)
             const _pageData = getState(context, PAGE_DATAS_KEY)
-            const webviewPanel = openWebview(
+            const webviewPanel: any = openWebview(
                 context,
                 node.id,
                 `${node.label}的配置`,

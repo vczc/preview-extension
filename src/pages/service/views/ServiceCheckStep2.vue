@@ -29,7 +29,7 @@
       </div>
       <el-table :data="fields.fields" style="width: 100%" border ref="selectTableRef">
         <el-table-column type="selection" width="55" />
-        <el-table-column label="Unicast" width="40%">
+        <el-table-column label="Unicast">
           <template #default="scope">
             <div style="display: flex; align-items: center">
               <el-select
@@ -50,7 +50,7 @@
             </div>
           </template>
         </el-table-column>
-        <el-table-column label="参数设置" align="center">
+        <el-table-column label="参数设置" align="center" width="240">
           <template #default="scope">
             <div class="cursor" @click="showDetail(scope.row)">
               <el-icon color="#666">
@@ -230,7 +230,7 @@ onMounted(() => {
       serviceStore.form.arxml = event.data.path
 
       const _initRes = await envInit({
-        env_root_path: '/home/zeekr/vscode',
+        env_root_path: serviceStore.form.sdkPath,
         arxml_file_path: event.data.path
       })
       if (_initRes.code === 200) {
