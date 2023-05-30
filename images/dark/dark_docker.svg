@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="13px" viewBox="0 0 16 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>icon/14/docker</title>
+    <g id="控件" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="left" transform="translate(-55.000000, -302.000000)">
+            <g id="编译调试工具" transform="translate(0.000000, 208.000000)">
+                <g id="关闭" transform="translate(0.000000, 80.000000)">
+                    <g id="icon/14/docker" transform="translate(56.000000, 13.000000)">
+                        <rect id="矩形" x="0" y="0" width="14" height="14"></rect>
+                        <g transform="translate(0.000000, 1.000000)">
+                            <path d="M0,5.35500606 L9.74812726,5.35500606 C10.1370266,1.94373214 10.943814,1.4859521 12.1684895,3.98166594 C12.1557945,4.12624218 15.7264574,3.98166594 12.9301733,6.70346787 C12.5828082,7.04158047 12.2469337,7.41782981 11.8599399,7.8112864 C5.65391066,14.1209565 1.70059737,13.3021964 0,5.35500606 Z" id="路径-2" stroke="#D5D3D4" stroke-linejoin="round"></path>
+                            <ellipse id="椭圆形" fill="#D5D3D4" cx="3.5" cy="8" rx="1" ry="1"></ellipse>
+                            <rect id="矩形" fill="#D5D3D4" x="1.4" y="2.4" width="1.4" height="1.6" rx="0.200000003"></rect>
+                            <rect id="矩形备份" fill="#D5D3D4" x="3.5" y="2.4" width="1.4" height="1.6" rx="0.200000003"></rect>
+                            <rect id="矩形备份-3" fill="#D5D3D4" x="3.5" y="0" width="1.4" height="1.6" rx="0.200000003"></rect>
+                            <rect id="矩形备份-2" fill="#D5D3D4" x="5.6" y="2.4" width="1.4" height="1.6" rx="0.200000003"></rect>
+                            <rect id="矩形备份-4" fill="#D5D3D4" x="5.6" y="0" width="1.4" height="1.6" rx="0.200000003"></rect>
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

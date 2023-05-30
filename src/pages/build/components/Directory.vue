@@ -38,7 +38,7 @@ const emits = defineEmits(['update:path'])
 const handleDirectory = () => {
   vmInstance?.$vscode.postMessage?.({ 
     id: 'vscode:dialog', 
-    path: props?.path
+    path: props?.path,
   }, '*');
 }
 

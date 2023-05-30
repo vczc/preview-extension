@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, watch, computed } from 'vue';
+import { ref, reactive, watch, computed, onMounted } from 'vue';
 import { FormItemRule } from 'element-plus';
 import { Plus } from '@element-plus/icons-vue';
 import { useCurrentInstance } from '../../../../utils/common';
@@ -24,6 +24,7 @@ interface Prebuilt {
 const formRef = ref()
 const prebuilt = ref<Prebuilt[]>([])
 const platform = ref<BaseOption[]>([])
+const pageId = ref<string>('')
 
 const formItems = reactive([
 	{
@@ -87,10 +88,12 @@ const formData = reactive<SDK_BUILD>({
 
 const handleAddSDK = () => {
 	formRef.value?.validate((valid: boolean) => {
+		console.log('formData', formData)
 		if (valid) {
 			vmInstance?.$vscode.postMessage?.({ 
 				id: 'vscode:message save-buildConfig', 
-				build_data: JSON.stringify(formData)
+				data: JSON.stringify(formData),
+				pageId: pageId.value
 			}, '*');
 		}
 	})
@@ -104,19 +107,26 @@ const handlePlatform = (val: string) => {
 	})) : []
 }
 
-watch(
-	() => history?.state?.params,
-	(val) => {
-		Object.keys(formData).forEach(i => {
-			formData[i] = (val?.[i] ?? '') as string
-		})
+onMounted(() => {
+	window.addEventListener('message', async (event) => { // 前端页面接收主进程发来的消息
+		if (event.data.id === 'initdata') {
+			console.log('接收到了初始化数据', event)
+			if (formData.sdkVersion === '') {
+				formData.sdkVersion = event.data.data.Default_version
+			}
+			prebuilt.value = event.data.data.Detail.prebuilt
+			handlePlatform(formData.sdkVersion)
+			pageId.value = event.data.pageId
+		}
+		if (event.data.id === 'pageData') {
+			const _pageData = JSON.parse(event.data.data) as any
+			Object.keys(_pageData).forEach(i => {
+				formData[i] = _pageData[i] ?? '';
+			}) as unknown as string
+		}
+	})
+})
 
-		if (formData.sdkVersion === '') formData.sdkVersion = val?.addition?.Default_version
-		prebuilt.value = val?.addition?.Detail?.prebuilt
-		handlePlatform(formData.sdkVersion)
-	},
-	{ immediate: true, deep: true }
-)
 </script>
 
 <template>

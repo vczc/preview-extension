@@ -12,26 +12,24 @@ import * as path from 'path';
 import * as dotenv from 'dotenv';
 
 // This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	console.log('zop-plugin is now active!');
-	// 初始化 env
+	// merge .env file's env variables
     dotenv.config({ path:  path.resolve(__dirname, '../.env')});
-	// console.log('融合env')
-	console.log('12测试是否成功1')
+	// registry all common commanders
 	registryCommanders(context);
 
-	// 服务开发部署工具
+	// initial code generator tools panel treeviews
 	initZopCodeView(context);
-	// 编译调试工具
+	// initial compile and debug panel treeviews
 	initCompileDebugView(context);
-	// 服务
+	// initial services tool panel treeviews
 	initServiceDebugView(context);
-	// 设置
+	// initial settings panel treeviews
 	initZopSettingView(context);
 	
-	// 初始化设置
-	initSetting();
+	// initial somethings~
+	initSetting(context);
 	// console.log('插件内打开的文件目录', vscode.workspace.workspaceFolders);
 	// console.log('当前插件工作目录', context.extensionUri);
 	// console.log('process.env', process.env);

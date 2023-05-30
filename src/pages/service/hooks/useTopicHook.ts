@@ -32,7 +32,18 @@ export function useTopicHook() {
       //   label: ''
       // }
     ],
-    fieldsSource: []
+    fieldsSource: [
+      // {
+      //   value: 'ChrgnDispStatus',
+      //   label: 'ChrgnDispStatus',
+      //   selected: false
+      // },
+      // {
+      //   value: 'OnBdChrgrPwrEnaAllwdStatus',
+      //   label: 'OnBdChrgrPwrEnaAllwdStatus',
+      //   selected: false
+      // },
+    ]
   })
 
   // init selector's data
@@ -53,7 +64,6 @@ export function useTopicHook() {
       fields.fieldsSource = formatteFields
       _fields!.data!.forEach(async (item) => {
         // init selecter details
-        // TODO: 记得打开下面注释
         initDetail(item)
       })
     }
@@ -61,7 +71,6 @@ export function useTopicHook() {
 
   // when selecter change
   const changeSelect = (val: string) => {
-    console.log('当前选项val', val)
     fields.fieldsSource = fields.fieldsSource.map((i) => {
       i.selected = val === i.value
       return i
@@ -69,7 +78,6 @@ export function useTopicHook() {
   }
   // click add btn
   const addRecord = () => {
-    console.log('新增了')
     fields.fieldsSource.length > fields.fields.length &&
       fields.fields.push({
         value: '',

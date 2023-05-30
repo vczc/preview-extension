@@ -17,8 +17,8 @@ export class ZopSettingViewTreeDataProvider implements vscode.TreeDataProvider<Z
                 {
                     id: `${new Date().getTime()+1}`, label: '设置', contextValue: 'Settings',
                     iconPath: {
-                        light: path.join(__dirname, '..', 'images/icons/light_setting.svg'), 
-                        dark: path.join(__dirname, '..', 'images/icons/dark_setting.svg'),
+                        light: path.join(__dirname, '..', 'images/light_setting.svg'), 
+                        dark: path.join(__dirname, '..', 'images/dark_setting.svg'),
                     },
                     children: [], collapsibleState: vscode.TreeItemCollapsibleState.None,
                     command: {
@@ -29,7 +29,6 @@ export class ZopSettingViewTreeDataProvider implements vscode.TreeDataProvider<Z
                 }
             ];
         }
-        console.log(this.data);
     }
 
 
@@ -55,7 +54,6 @@ export function initZopSettingView(context: vscode.ExtensionContext) {
     
     // registry open user settings command
     context.subscriptions.push(vscode.commands.registerCommand('zopPlugin.openSetting', (node: ZopViewNode) => {
-        console.log('打开设置');
         vscode.commands.executeCommand('workbench.action.openSettings', 'Zoks: Global SDK Path');
     }));
     

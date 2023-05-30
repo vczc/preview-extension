@@ -20,14 +20,13 @@ export class ZopCodeGenerateTreeDataProvider implements vscode.TreeDataProvider<
     data: ZopViewNode[];
 
     constructor(private context: vscode.ExtensionContext) {
-        console.log('我是zopCode')
         this.context = context;
         this.data = [
             {
                 id: `${new Date().getTime()+1}`, label: '工具链', contextValue: 'Tool_Chain',
                 iconPath: {
-                    light: path.join(__dirname, '..', 'images/icons/light_toolchain.svg'), 
-                    dark: path.join(__dirname, '..', 'images/icons/dark_toolchain.svg'),
+                    light: path.join(__dirname, '..', 'images/light/light_toolchain.svg'), 
+                    dark: path.join(__dirname, '..', 'images/dark/dark_toolchain.svg'),
                 },
                 children: [], collapsibleState: vscode.TreeItemCollapsibleState.None,
                 command: {
@@ -63,7 +62,6 @@ export function initZopCodeView(context: vscode.ExtensionContext) {
     
     // 点击工具链
     context.subscriptions.push(vscode.commands.registerCommand("toolChain.click", () => {
-        console.log('点击工具链');
         const mathExt: any = vscode.extensions.getExtension("toolchain.Tortie-preview");
         const importedApi = mathExt.exports;
         // const url = "http://127.0.0.1:15000/service_demo/#/service/service_design";

@@ -1,11 +1,9 @@
-import { getCurrentInstance } from 'vue'
-import type { ComponentInternalInstance } from 'vue'
 
-export function useCurrentInstance () {
-    const { appContext, proxy } = (getCurrentInstance() as ComponentInternalInstance)
-    const _this = appContext.config.globalProperties
-    return [
-        _this,
-        proxy
-    ]
+export const saveState = (context: any, key: string, value: any) => {
+    return context.globalState.update(key, JSON.stringify(value));
+}
+
+export const getState = (context: any, key: string) => {
+    const _d = context.globalState.get(key);
+    return _d ? JSON.parse(_d) : {}
 }

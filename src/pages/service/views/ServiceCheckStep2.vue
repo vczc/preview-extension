@@ -29,13 +29,14 @@
       </div>
       <el-table :data="fields.fields" style="width: 100%" border ref="selectTableRef">
         <el-table-column type="selection" width="55" />
-        <el-table-column label="Unicast">
+        <el-table-column label="Unicast" width="40%">
           <template #default="scope">
             <div style="display: flex; align-items: center">
               <el-select
                 v-model="fields.fields[scope['$index']].value"
                 placeholder="请选择"
                 @change="changeSelect"
+                styel="width:100%"
               >
                 <el-option
                   v-for="item in fields.fieldsSource"
@@ -70,8 +71,8 @@
       </el-table>
     </div>
     <div class="start-btn">
-      <el-button plain type="warning" @click="startAction">启动</el-button>
-      <el-button plain type="warning" @click="stopAction">停止</el-button>
+      <el-button v-if="!canStop" plain type="warning" @click="startAction">启动</el-button>
+      <el-button v-else plain type="warning" @click="stopAction">停止</el-button>
     </div>
     <el-drawer v-model="showDrawer" direction="rtl" size="600">
       <template #header>
@@ -91,7 +92,7 @@
               <div style="display: flex; align-items: center">
                 <template v-if="!row.children?.length">
                   <template v-if="row.type === 'bool'">
-                    <el-switch v-model="row.value" />
+                    <el-switch v-model="row.value" active-text="true" inactive-text="false"/>
                   </template>
                   <template v-else-if="row.type === 'string'">
                     <el-input v-model="row.value" placeholder="请输入..."></el-input>
@@ -158,6 +159,7 @@ import { useAppInstanceHook } from '../hooks/useAppInstance'
 const [appInstance] = useAppInstanceHook()
 
 const topicData = ref<PublishTableItem[]>([])
+const canStop = ref(false)
 // fake data from backend
 // const testData = reactive({
 //   topic_name: 'OnBdChrgrPwrEnaAllwdStatus',
@@ -229,7 +231,7 @@ onMounted(() => {
 
       const _initRes = await envInit({
         env_root_path: '/home/zeekr/vscode',
-        arxml_file_path: event.data.path || '/home/a/work/soa/new_tool/svt/backend/files/arxml/ZSDB222400_ChargeService_1_P_PropulsionASWC_CSCBCACore.arxml'
+        arxml_file_path: event.data.path
       })
       if (_initRes.code === 200) {
         const _appInfo = await getAppInfo({ appname: '' })
@@ -248,14 +250,14 @@ const selectFilePath = async () => {
   // serviceStore.form.arxml = '/asdf'
   appInstance.$vscode.postMessage({ 
     id: 'vscode:dialog', 
-    path: ''
+    path: '',
+    canSelectFiles: true
   }, '*');
 
 }
 
 const stopAction = async () => {
   const _stopRes = await commit({ type: 1 })
-  console.log(_stopRes)
 }
 
 const startAction = async () => {
@@ -289,8 +291,8 @@ const startAction = async () => {
       obj.data.fields.push(_field)
     }
   })
-  console.log('最终', obj)
   const _startRes = await start(obj)
+  canStop.value = true
   console.log(_startRes)
 }
 

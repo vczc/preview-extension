@@ -1,8 +1,5 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
-// const {nanoid} = require('nanoid');
-import {nanoid} from 'nanoid';
-import { infoMsg, warningMsg } from './utils';
 import { ZopViewNode } from './zopCodeGenerateView';
 import { openWebview } from './webview';
 export let zopServiceDebugInstance: ZopServiceDebugTreeDataProvider | null = null;
@@ -24,8 +21,8 @@ export class ZopServiceDebugTreeDataProvider implements vscode.TreeDataProvider<
                 label: _serviceLabel,
                 contextValue: _serviceContextValue,
                 iconPath: {
-                    light: path.join(__dirname, '..', 'images/icons/light_service.svg'), 
-                    dark: path.join(__dirname, '..', 'images/icons/dark_service.svg'),
+                    light: path.join(__dirname, '..', 'images/light/light_service.svg'), 
+                    dark: path.join(__dirname, '..', 'images/dark/dark_service.svg'),
                 },
                 children: [], collapsibleState: vscode.TreeItemCollapsibleState.None,
                 command: {

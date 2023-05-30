@@ -3,6 +3,9 @@ import * as path from 'path';
 import { infoMsg, warningMsg } from './utils/index';
 import { openWebview } from './webview';
 import { ZopViewNode } from './zopCodeGenerateView';
+import { getPlatformsFromSh } from './initProject';
+import { getState } from './utils/common';
+import { BUILD_PAGE_INITDATA, PAGE_DATAS_KEY } from './constants/config';
 
 export let zopCompileDebugProviderInstance: ZopCompileDebugTreeDataProvider | null = null;
 
@@ -19,18 +22,33 @@ export class ZopCompileDebugTreeDataProvider implements vscode.TreeDataProvider<
         this.context = context;
         this.contextValue = 'zopCompileDebug';
         this.initialData = [
-            { id: `${new Date().getTime()+11}`, label: 'Build Settings', contextValue: 'Build_setting', iconPath: {
-                light: path.join(__dirname, '..', 'images/icons/light_build.svg'), 
-                dark: path.join(__dirname, '..', 'images/icons/dark_build.svg'),
-            }, children: [], collapsibleState: vscode.TreeItemCollapsibleState.Collapsed },
-            { id: `${new Date().getTime()+22}`, label: 'Docker_Debugging', contextValue: 'Docker_Debuggingsss', iconPath: {
-                light: path.join(__dirname, '..', 'images/icons/light_docker.svg'), 
-                dark: path.join(__dirname, '..', 'images/icons/dark_docker.svg'),
-            }, children: [], collapsibleState: vscode.TreeItemCollapsibleState.Collapsed },
-            { id: `${new Date().getTime()+33}`, label: 'Gdb_docker_debugging', contextValue: 'Gdb_docker_debugging', iconPath: {
-                light: path.join(__dirname, '..', 'images/icons/light_gdb.svg'), 
-                dark: path.join(__dirname, '..', 'images/icons/dark_gdb.svg'),
-            }, children: [], collapsibleState: vscode.TreeItemCollapsibleState.Collapsed },
+            {
+                id: `${new Date().getTime()+11}`, label: 'Build Settings', contextValue: 'Build_setting',
+                iconPath: {
+                    light: path.join(__dirname, '..', 'images/light/light_build.svg'), 
+                    dark: path.join(__dirname, '..', 'images/dark/dark_build.svg'),
+                },
+                children: [],
+                collapsibleState: vscode.TreeItemCollapsibleState.Collapsed 
+            },
+            {
+                id: `${new Date().getTime()+22}`, label: 'Docker_Debugging', contextValue: 'Docker_Debuggingsss',
+                iconPath: {
+                    light: path.join(__dirname, '..', 'images/light/light_docker.svg'), 
+                    dark: path.join(__dirname, '..', 'images/dark/dark_docker.svg'),
+                },
+                children: [],
+                collapsibleState: vscode.TreeItemCollapsibleState.Collapsed 
+            },
+            {
+                id: `${new Date().getTime()+33}`, label: 'Gdb_docker_debugging', contextValue: 'Gdb_docker_debugging',
+                iconPath: {
+                    light: path.join(__dirname, '..', 'images/light/light_gdb.svg'), 
+                    dark: path.join(__dirname, '..', 'images/dark/dark_gdb.svg'),
+                },
+                children: [],
+                collapsibleState: vscode.TreeItemCollapsibleState.Collapsed
+            },
             {
                 id: `${new Date().getTime()+44}`, label: 'test-清除缓存', contextValue: 'clearCacheTreeData', iconPath: {
                     light: path.join(__dirname, '..', 'images/service.svg'), 
@@ -119,8 +137,7 @@ export class ZopCompileDebugTreeDataProvider implements vscode.TreeDataProvider<
         node.children?.push(newNode);
         this.cacheTreeData();
         this.refresh();
-            infoMsg(`新增节点: ${value} 成功!`);
-        console.log(node);
+        infoMsg(`新增节点: ${value} 成功!`);
     }
 
     refresh(): void {
@@ -147,7 +164,6 @@ export function initCompileDebugView(context: vscode.ExtensionContext) {
     // registry renameNode command
     context.subscriptions.push(vscode.commands.registerCommand('zopPlugin.renameNode', (node: ZopViewNode) => {
         vscode.window.showInputBox({ prompt: '请输入新名称' }).then(value => {
-            console.log(node, value);
             if (value) {
                 zopCompileDebugProviderInstance!.renameSubNode(node, value);
             }
@@ -163,18 +179,36 @@ export function initCompileDebugView(context: vscode.ExtensionContext) {
     context.subscriptions.push(vscode.commands.registerCommand('zopPlugin.delCache', () => {
         zopCompileDebugProviderInstance!.clearCacheTreeData();
         vscode.window.showInformationMessage(`清理成功!`);
-        console.log('掉到了');
+        context.globalState.update(BUILD_PAGE_INITDATA, '')
+        context.globalState.update(PAGE_DATAS_KEY, '')
     }));
 
-    context.subscriptions.push(vscode.commands.registerCommand('Build_setting_click', (node) => {
-        console.log('点击了Build_setting_click',node);
-        openWebview(
-            context,
-            node.id,
-            `${node.label}的配置`,
-            'http://localhost:5173/build.html/#/build-config',
-            'build.html'
-        );
+    context.subscriptions.push(vscode.commands.registerCommand('Build_setting_click', async (node) => {
+        if(await getPlatformsFromSh(context)) {
+            const _buildPageInitData = getState(context, BUILD_PAGE_INITDATA)
+            const _pageData = getState(context, PAGE_DATAS_KEY)
+            const webviewPanel = openWebview(
+                context,
+                node.id,
+                `${node.label}的配置`,
+                'http://localhost:5173/build.html/#/build-config',
+                'build.html'
+            );
+            webviewPanel[node.id].webview.postMessage({
+                id: 'initdata',
+                data: _buildPageInitData,
+                pageId: node.id
+            })
+            const nodePageData = _pageData[node.id]
+            if (nodePageData) {
+                webviewPanel[node.id].webview.postMessage({
+                    id: 'pageData',
+                    data: nodePageData,
+                    pageId: node.id
+                })  
+            }
+        }
+        
     }));
     
 }

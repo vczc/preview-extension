@@ -1,27 +1,18 @@
 import * as vscode from 'vscode';
-import { zopCodeProviderInstance } from './zopCodeGenerateView';
+import { zopCompileDebugProviderInstance } from './zopCompileDebugView';
 import { infoMsg } from './utils/index';
 
 export default function(context: vscode.ExtensionContext) {
-    
     // 刷新 公用方法
     context.subscriptions.push(vscode.commands.registerCommand('view.refresh', (node) => {
-        console.log(node);
         switch (node.contextValue) {
             case 'Build_setting':
-                // zopCodeProviderInstance?.refresh();
+                zopCompileDebugProviderInstance?.refresh();
                 break;
             default:
-                // zopCodeProviderInstance?.refresh();
+                zopCompileDebugProviderInstance?.refresh();
                 break;
         }
-        infoMsg(`刷新按钮点击!`);
+        infoMsg(`刷新成功!`);
     }));
-
-    // 服务校验点击
-    // context.subscriptions.push(vscode.commands.registerCommand("serviceVerify.click", () => {
-    //     console.log("serviceVerify.click!");
-    // }));
-
-  
 }

@@ -22,31 +22,60 @@
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">下一步</el-button>
+        <!-- <el-button type="primary" @click="router.push('/step2')">第二部</el-button> -->
         <!-- <el-button type="primary" @click="testPostMessage">postMsg</el-button> -->
+      </el-form-item>
+      <el-form-item v-if="showStrartTip">
+        <el-alert title="环境初始化中, 可能耗时较长, 初始化完毕自动跳转, 请耐心等待!" type="warning" />
       </el-form-item>
     </el-form>
   </main>
 </template>
   
 <script lang="ts" setup>
-import { ComponentInternalInstance, getCurrentInstance, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useServicesStore } from '../stores/services'
 import { useRouter } from 'vue-router'
 import { getVersionPlatform } from '../services/serviceCheck'
 import type { VersionPlatform } from '../services/service'
 import { ElMessage } from 'element-plus'
 import { useAppInstanceHook } from '../hooks/useAppInstance'
+import { checkIpv4, checkSubnetMask } from '../utils'
 
 const [appInstance] = useAppInstanceHook()
-console.log('传递过来了', appInstance);
-
-
 const router = useRouter()
-
 const formRef = ref()
+const showStrartTip = ref(false)
 // all the form data save in the pinia store
 const serviceStore = useServicesStore()
 
+// validate ip_address (type:ipv4)
+const validaIp = (rule: any, value: any, callback: any) => {
+  if (value === '') {
+    callback(new Error('请输入平台IP'))
+  } else {
+    if (!checkIpv4(value)) {
+      callback('IP格式填写错误')
+    } else {
+      callback()
+    }
+  }
+}
+
+// validate subnext mask (type:ipv4)
+const validaSubnetMask = (rule: any, value: any, callback: any) => {
+  if (value === '') {
+    callback(new Error('请输入平台IP'))
+  } else {
+    if (!checkSubnetMask(value)) {
+      callback('IP格式填写错误')
+    } else {
+      callback()
+    }
+  }
+}
+
+// form submit rules
 const ruleForm = reactive({
   version: [
     { required: true, message: '请选择ZKOS版本', trigger: 'change' },
@@ -58,31 +87,22 @@ const ruleForm = reactive({
     { required: true, message: '请输入Service Clien IP', trigger: 'blur' },
   ],
   ip_address: [
-    { required: true, message: '请输入平台IP', trigger: 'blur' },
+    { required: true, message: '请输入平台IP', trigger: 'blur'},
+    { validator: validaIp, trigger: 'blur' }
   ],
   mask: [
     { required: true, message: '请输入掩码', trigger: 'blur' },
+    { validator: validaSubnetMask, trigger: 'blur' }
   ]
 })
 
-// const testPostMessage = () => {
-//   // window.postMessage({ command: 'doSomething' }, '*')
-//   // @ts-ignore
-//   console.log('看看传递过来了吗', appInstance)
-//   const _storage = localStorage.getItem('step1')
-//   console.log('获取缓存点击',_storage)
-//   appInstance.$vscode.postMessage({ 
-//     id: 'vscode:dialog', 
-//     path: ''
-//   }, '*');
-
-// }
 
 onMounted(() => {
-
+  // get sudo stdout and change router
   window.addEventListener('message', async (event) => { // 前端页面接收主进程发来的消息
     if (event.data.id === 'vscode:sudo:cb') {
       console.log('接收到了sudo后的回调', event.data.data);
+      showStrartTip.value = false
       router.push('/step2')
     }
   })
@@ -107,16 +127,11 @@ const selectors = reactive<VersionPlatform>({
 const onSubmit = () => {
   formRef.value.validate((valid: boolean) => {
     if (valid) {
+      showStrartTip.value = true
       appInstance.$vscode.postMessage({ 
         id: 'vscode:sudo', 
         files: ['a.sh']
       }, '*');
-      
-
-    } else {
-      console.log('error submit!')
-      ElMessage.warning('参数不完整!')
-      return false
     }
   })
 }
