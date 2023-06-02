@@ -18,29 +18,7 @@ export function receiveMessageFromWebview(pannel: vscode.WebviewPanel, context: 
     }
 
     if (evName === 'vscode:sudo') {
-      const options = {
-        name: 'VSCode',
-        icns: '/Applications/Visual Studio Code.app/Contents/Resources/Code.icns', // (optional)
-      };
       initEnvironment(e, pannel)
-      // const _path = path.resolve(process.env.VSCODE_CWD as string, 'src-extension/a.sh')
-      // sudo.exec(_path, options,
-      //   function (error, stdout, stderr) {
-      //     if (error) {
-      //       console.log('出错了', error)
-      //       pannel.webview.postMessage({
-      //         id: "vscode:sudo:cb",
-      //         data: { message: error.message, stderr }
-      //       });
-      //     } else {
-      //       pannel.webview.postMessage({
-      //         id: "vscode:sudo:cb",
-      //         data: { message: stdout, }
-      //       });
-      //     }
-      //     console.log('stdout: ' + stdout);
-      //   }
-      // );
     }
 
     if (evName === "vscode:dialog") {
@@ -80,39 +58,29 @@ async function initEnvironment(event: any, pannel: vscode.WebviewPanel) {
       };
       // const stopSh = `${_sdkPath}/my_start_env.sh disable`
       // const startSh = `${_sdkPath}/my_start_env.sh enable sdkpath ip mask`
-      const stopSh = `${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/env_init.sh disable`
-      const startSh = `${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/env_init.sh enable ${_sdkPath} ${event.version} ${event.ip_address} ${event.mask}`
+      // const stopSh = `${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/env_init.sh disable`
+      const startSh = `${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/env_init.sh  ${_sdkPath} ${event.version} ${event.ip_address} ${event.mask} ${event.platform_info} $USER`
 
-      sudo.exec(stopSh, options,
-          function (error, stdout, stderr) {
-            if (error) {
-              console.log('初始化停止出错了1', error)
-              errorMsg(`初始化出错了${error}`)
-            } else {
-              sudo.exec(startSh, options, (error, stdout, stderr) => {
-                  if (error) {
-                      console.log('启动初始化环境失败2', error)
-                      errorMsg(`启动初始化环境错误 ${error}`)
-                      pannel.webview.postMessage({
-                        id: "vscode:sudo:cb",
-                        data: { message: error.message, stderr, type: 'error' },
-                        sdkPath: _sdkPath
-                      });
-                  } else {
-                    pannel.webview.postMessage({
-                      id: "vscode:sudo:cb",
-                      data: {
-                        message: 'success', 
-                        type: 'success'
-                      },
-                      sdkPath: _sdkPath
-                    });
-                  }
-              })
-            }
-            console.log('stdout: ' + stdout);
+      sudo.exec(startSh, options, (error, stdout, stderr) => {
+          if (error) {
+              console.log('启动初始化环境失败2', error)
+              errorMsg(`启动初始化环境错误 ${error}`)
+              pannel.webview.postMessage({
+                id: "vscode:sudo:cb",
+                data: { message: error.message, stderr, type: 'error' },
+                sdkPath: _sdkPath
+              });
+          } else {
+            pannel.webview.postMessage({
+              id: "vscode:sudo:cb",
+              data: {
+                message: 'success', 
+                type: 'success'
+              },
+              sdkPath: _sdkPath
+            });
           }
-        );
+      })
 
   } catch (error) {
       console.log('初始化环境出错!')

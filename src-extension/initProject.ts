@@ -10,12 +10,28 @@ let context: vscode.ExtensionContext | null = null
 let buildPageData: any = null;
 export const initSetting = (context: vscode.ExtensionContext) => {
     context = context
+    // let config: string = vscode.workspace.getConfiguration().get(SDK_PATH_NAME) || '';
+    // let password= ''
+    // child_process.exec(`mkdir ${config}/aabb`)
+    // const child = child_process.spawn('sudo', ['-S $USER', 'bash', `${config}/a.sh`]);
+    // child.stdin.write(`${password}\n`);
+    // child.stdin.end();
+    // child.stdout.on('data', (data) => {
+    //     console.log(`脚本输出: ${data}`);
+    //   });
+      
+    //   child.stderr.on('data', (data) => {
+    //     console.error(`脚本错误: ${data}`);
+    //   });
+      
+    //   child.on('close', (code) => {
+    //     console.log(`脚本执行完成，退出码: ${code}`);
+    //   });
     // const _isExists = fs.existsSync(path.join(__dirname, '../.vscode'));
     // console.log('是否存在目录',_isExists);
     // const config = vscode.workspace.getConfiguration();
     // const configPath = config.get(SDK_PATH_NAME);
     // console.log(`配置项 Zoks: ${SDK_PATH_NAME}`, configPath);
-
 };
 
 

@@ -882,11 +882,6 @@ function receiveMessageFromWebview(pannel, context) {
       infoMsg("\u4FDD\u5B58\u914D\u7F6E\u6210\u529F");
     }
     if (evName === "vscode:sudo") {
-      const options = {
-        name: "VSCode",
-        icns: "/Applications/Visual Studio Code.app/Contents/Resources/Code.icns"
-        // (optional)
-      };
       initEnvironment(e, pannel);
     }
     if (evName === "vscode:dialog") {
@@ -920,40 +915,27 @@ async function initEnvironment(event, pannel) {
       name: "VSCode"
       // icns: '/Applications/Visual Studio Code.app/Contents/Resources/Code.icns', // (optional)
     };
-    const stopSh = `${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/env_init.sh disable`;
-    const startSh = `${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/env_init.sh enable ${_sdkPath} ${event.version} ${event.ip_address} ${event.mask}`;
-    sudo.exec(
-      stopSh,
-      options,
-      function(error, stdout, stderr) {
-        if (error) {
-          console.log("\u521D\u59CB\u5316\u505C\u6B62\u51FA\u9519\u4E861", error);
-          errorMsg(`\u521D\u59CB\u5316\u51FA\u9519\u4E86${error}`);
-        } else {
-          sudo.exec(startSh, options, (error2, stdout2, stderr2) => {
-            if (error2) {
-              console.log("\u542F\u52A8\u521D\u59CB\u5316\u73AF\u5883\u5931\u8D252", error2);
-              errorMsg(`\u542F\u52A8\u521D\u59CB\u5316\u73AF\u5883\u9519\u8BEF ${error2}`);
-              pannel.webview.postMessage({
-                id: "vscode:sudo:cb",
-                data: { message: error2.message, stderr: stderr2, type: "error" },
-                sdkPath: _sdkPath
-              });
-            } else {
-              pannel.webview.postMessage({
-                id: "vscode:sudo:cb",
-                data: {
-                  message: "success",
-                  type: "success"
-                },
-                sdkPath: _sdkPath
-              });
-            }
-          });
-        }
-        console.log("stdout: " + stdout);
+    const startSh = `${_sdkPath}/toolchains/svt/tools/svt-backend/files/scripts/env_init.sh  ${_sdkPath} ${event.version} ${event.ip_address} ${event.mask} ${event.platform_info} $USER`;
+    sudo.exec(startSh, options, (error, stdout, stderr) => {
+      if (error) {
+        console.log("\u542F\u52A8\u521D\u59CB\u5316\u73AF\u5883\u5931\u8D252", error);
+        errorMsg(`\u542F\u52A8\u521D\u59CB\u5316\u73AF\u5883\u9519\u8BEF ${error}`);
+        pannel.webview.postMessage({
+          id: "vscode:sudo:cb",
+          data: { message: error.message, stderr, type: "error" },
+          sdkPath: _sdkPath
+        });
+      } else {
+        pannel.webview.postMessage({
+          id: "vscode:sudo:cb",
+          data: {
+            message: "success",
+            type: "success"
+          },
+          sdkPath: _sdkPath
+        });
       }
-    );
+    });
   } catch (error) {
     console.log("\u521D\u59CB\u5316\u73AF\u5883\u51FA\u9519!");
   }
@@ -1163,23 +1145,19 @@ var ZopCompileDebugTreeDataProvider = class {
         },
         children: [],
         collapsibleState: vscode5.TreeItemCollapsibleState.Collapsed
-      },
-      {
-        id: `${(/* @__PURE__ */ new Date()).getTime() + 44}`,
-        label: "test-\u6E05\u9664\u7F13\u5B58",
-        contextValue: "clearCacheTreeData",
-        iconPath: {
-          light: path4.join(__dirname, "..", "images/service.svg"),
-          dark: path4.join(__dirname, "..", "images/service.svg")
-        },
-        children: [],
-        collapsibleState: vscode5.TreeItemCollapsibleState.None,
-        command: {
-          title: "\u6D4B\u8BD5",
-          command: "zopPlugin.delCache",
-          arguments: []
-        }
       }
+      // {
+      //     id: `${new Date().getTime()+44}`, label: 'test-清除缓存', contextValue: 'clearCacheTreeData', iconPath: {
+      //         light: path.join(__dirname, '..', 'images/service.svg'), 
+      //         dark: path.join(__dirname, '..', 'images/service.svg'),
+      //     },
+      //     children: [], collapsibleState: vscode.TreeItemCollapsibleState.None,
+      //     command: {
+      //         title: '测试',
+      //         command: 'zopPlugin.delCache',
+      //         arguments: []
+      //     }
+      //  },
     ];
     if (treeDataJson) {
       const _cacheData = JSON.parse(treeDataJson);
@@ -1396,8 +1374,8 @@ var ZopSettingViewTreeDataProvider = class {
           label: "\u8BBE\u7F6E",
           contextValue: "Settings",
           iconPath: {
-            light: path6.join(__dirname, "..", "images/light_setting.svg"),
-            dark: path6.join(__dirname, "..", "images/dark_setting.svg")
+            light: path6.join(__dirname, "..", "images/light/light_setting.svg"),
+            dark: path6.join(__dirname, "..", "images/dark/dark_setting.svg")
           },
           children: [],
           collapsibleState: vscode8.TreeItemCollapsibleState.None,
@@ -1529,10 +1507,15 @@ function initServiceDebugView(context) {
   context.subscriptions.push(vscode10.window.registerTreeDataProvider("zopCheckDebugToolView", zopServiceDebugInstance));
   context.subscriptions.push(vscode10.commands.registerCommand("serviceCheck.click", async (node) => {
     await startServer();
+    if (!checkSDKPath()) {
+      warningMsg("\u8BF7\u5148\u914D\u7F6EGlobal Sdk Path !");
+      vscode10.commands.executeCommand("workbench.action.openSettings", SDK_PATH_NAME);
+      return;
+    }
     setTimeout(() => {
-      console.log("\u6253\u5F00webview\u56DE\u8C03");
+      console.log("1s\u6253\u5F00webview\u56DE\u8C03");
       openWebview(context, node.id, `\u670D\u52A1\u9A8C\u8BC1`, process.env.SERVICE_WEBVIEW, "service.html", stopServer);
-    }, 2e3);
+    }, 1e3);
   }));
 }
 

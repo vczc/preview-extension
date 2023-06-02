@@ -17,8 +17,8 @@ export class ZopSettingViewTreeDataProvider implements vscode.TreeDataProvider<Z
                 {
                     id: `${new Date().getTime()+1}`, label: '设置', contextValue: 'Settings',
                     iconPath: {
-                        light: path.join(__dirname, '..', 'images/light_setting.svg'), 
-                        dark: path.join(__dirname, '..', 'images/dark_setting.svg'),
+                        light: path.join(__dirname, '..', 'images/light/light_setting.svg'), 
+                        dark: path.join(__dirname, '..', 'images/dark/dark_setting.svg'),
                     },
                     children: [], collapsibleState: vscode.TreeItemCollapsibleState.None,
                     command: {

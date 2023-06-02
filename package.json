@@ -1,7 +1,7 @@
 {
   "name": "zkos-studio-plugin",
   "displayName": "zkos-studio-plugin",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.78.0"
   },

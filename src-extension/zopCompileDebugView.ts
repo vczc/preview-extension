@@ -49,18 +49,18 @@ export class ZopCompileDebugTreeDataProvider implements vscode.TreeDataProvider<
                 children: [],
                 collapsibleState: vscode.TreeItemCollapsibleState.Collapsed
             },
-            {
-                id: `${new Date().getTime()+44}`, label: 'test-清除缓存', contextValue: 'clearCacheTreeData', iconPath: {
-                    light: path.join(__dirname, '..', 'images/service.svg'), 
-                    dark: path.join(__dirname, '..', 'images/service.svg'),
-                },
-                children: [], collapsibleState: vscode.TreeItemCollapsibleState.None,
-                command: {
-                    title: '测试',
-                    command: 'zopPlugin.delCache',
-                    arguments: []
-                }
-             },
+            // {
+            //     id: `${new Date().getTime()+44}`, label: 'test-清除缓存', contextValue: 'clearCacheTreeData', iconPath: {
+            //         light: path.join(__dirname, '..', 'images/service.svg'), 
+            //         dark: path.join(__dirname, '..', 'images/service.svg'),
+            //     },
+            //     children: [], collapsibleState: vscode.TreeItemCollapsibleState.None,
+            //     command: {
+            //         title: '测试',
+            //         command: 'zopPlugin.delCache',
+            //         arguments: []
+            //     }
+            //  },
         ];
         if (treeDataJson) {
             const _cacheData = JSON.parse(treeDataJson);

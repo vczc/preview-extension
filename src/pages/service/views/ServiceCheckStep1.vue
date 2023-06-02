@@ -21,7 +21,7 @@
         <el-input v-model="serviceStore.form.mask" placeholder="请输入和目标平台同网段的mask掩码" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">下一步</el-button>
+        <el-button type="primary" :loading="showStrartTip" @click="onSubmit">下一步</el-button>
         <!-- <el-button type="primary" @click="router.push('/step2')">第二部</el-button> -->
         <!-- <el-button type="primary" @click="testPostMessage">postMsg</el-button> -->
       </el-form-item>
@@ -133,7 +133,8 @@ const onSubmit = () => {
         id: 'vscode:sudo',
         ip_address: serviceStore.form.ip_address,
         mask: serviceStore.form.mask,
-        version: serviceStore.form.version
+        version: serviceStore.form.version,
+        platform_info: serviceStore.form.platform_info,
       }, '*');
     }
   })

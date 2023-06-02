@@ -258,6 +258,7 @@ const selectFilePath = async () => {
 
 const stopAction = async () => {
   const _stopRes = await commit({ type: 1 })
+  canStop.value = false
 }
 
 const startAction = async () => {
