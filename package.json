@@ -12,9 +12,6 @@
   "license": "SEE LICENSE IN LICENSE",
   "icon": "images/logo.png",
   "activationEvents": [],
-  "extensionDependencies": [
-    "toolchain.Tortie-preview"
-  ],
   "main": "./out/extension.js",
   "scripts": {
     "dev": "vite",
@@ -22,7 +19,7 @@
     "esbuild-base": "esbuild ./src-extension/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --sourcemap",
     "esbuild": "npm run esbuild-base -- --sourcemap",
     "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run esbuild && npm run build:static",
     "compile": "tsc -p ./",
     "watch": "npm run build:static && NODE_ENV=development npm run esbuild-base -- --sourcemap --watch",
     "pretest": "npm run compile && npm run lint",
@@ -78,12 +75,12 @@
       }
     },
     "webviews": [
-			{
-				"match": "http://10.114.149.125:15000/service_demo/#/service/service_design",
-				"name": "test",
-				"webviewContentSecurityPolicy": "default-src 'self' http://10.114.149.125:15000/service_demo/#/service/service_design; frame-src http://10.114.149.125:15000/service_demo/#/service/service_design"
-			}
-		],
+      {
+        "match": "http://10.114.149.125:15000/service_demo/#/service/service_design",
+        "name": "test",
+        "webviewContentSecurityPolicy": "default-src 'self' http://10.114.149.125:15000/service_demo/#/service/service_design; frame-src http://10.114.149.125:15000/service_demo/#/service/service_design"
+      }
+    ],
     "commands": [
       {
         "command": "zopPlugin.addNewNode",
@@ -185,5 +182,9 @@
         "contents": "简介: ZKOS SDK使用帮助\n当前版本: v0.0.1\n[$(preview)zkos主页](https://zkos.zeekrlife.com/zh/home/)\n"
       }
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git-devops.zeekrlife.com/e-qizhu.wu/zop-plugin.git"
   }
 }

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import {resolve} from 'path';
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -16,8 +16,9 @@ export default defineConfig({
       input: {
         build: resolve(__dirname, './build.html'),
         service: resolve(__dirname, './service.html'),
+        browser: resolve(__dirname, './browser.html')
       }
-    },
+    }
   },
   resolve: {
     alias: {
@@ -25,6 +26,7 @@ export default defineConfig({
     }
   },
   server: {
+    host: '0.0.0.0',
     // 配置跨域
     cors: true,
     // 自定义响应头
@@ -37,8 +39,8 @@ export default defineConfig({
       '/api': {
         target: 'http://10.114.148.55:9090',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        rewrite: path => path.replace(/^\/api/, '')
       }
     }
-  },
-});
+  }
+})
