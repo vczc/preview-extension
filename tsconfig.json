@@ -1,30 +1,23 @@
 {
-	"compilerOptions": {
-	  "target": "ES2020",
-	  "useDefineForClassFields": true,
-	  "module": "commonjs",
-	  "moduleResolution": "Node",
-	  "strict": true,
-	  "jsx": "preserve",
-	  "resolveJsonModule": true,
-	  "isolatedModules": false,
-	  "esModuleInterop": true,
-	  "lib": ["ES2020", "DOM"],
-	  "skipLibCheck": true,
-	  "baseUrl": "./",
-	  "noEmit": true,
-	  "sourceMap": true,
-	  "outDir": "./out",
-	},
-	"include": [
-		"src/**/*.ts",
-		"src/**/*.d.ts",
-		"src/**/*.d.ts",
-		"src/**/*.vue",
-		"src-extension/*.ts",
-		"src-extension/**/*.ts"
-	],
-	"exclude": ["node_modules"],
-	"references": [{ "path": "./tsconfig.node.json" }]
-  }
-  
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "module": "commonjs",
+    "moduleResolution": "Node",
+    "strict": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": false,
+    "esModuleInterop": true,
+    "lib": ["ES2020", "DOM"],
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "noEmit": true,
+    "sourceMap": true,
+    "outDir": "./out",
+    "typeRoots": ["node_modules/@types", "types/**/*.d.ts"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.d.ts", "src/**/*.vue", "src-extension/*.ts", "src-extension/**/*.ts", "types/**/*.d.ts"],
+  "exclude": ["node_modules"],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}

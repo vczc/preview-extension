@@ -6,3 +6,18 @@
  * --no-sandbox linux特有参数
  */
 export const CHROME_ARGS = ['--disable-gpu', '--disable-dev-shm-usage', '--start-maximized', '--no-sandbox']
+
+/** 自定义事件名称 */
+export enum CustomEventName {
+  OPEN_FILE = 'extension.openFile',
+  UPDATE_TITLE = 'extension.updateTitle',
+  APP_STATE_CHANGED = 'extension.appStateChanged',
+  APP_CONFIGURATION = 'extension.appConfiguration',
+  WINDOW_OPEN_REQUESTED = 'extension.windowOpenRequested',
+  WINDOW_DIALOG_REQUESTED = 'extension.windowDialogRequested'
+}
+
+/** Cdp协议Page事件名称 */
+export enum CdpPageEventName {
+  HANDLE_JAVASCRIPT_DIALOG = 'Page.handleJavaScriptDialog'
+}

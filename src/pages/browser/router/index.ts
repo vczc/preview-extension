@@ -1,19 +1,18 @@
-import { createRouter, createWebHashHistory } from "vue-router";
-import type { RouteRecordRaw } from "vue-router";
-
-import HelloWorld from "../views/HelloWorld.vue";
+import { createRouter, createWebHashHistory } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
+import Index from '../views/index.vue'
 
 const routerConfig: RouteRecordRaw[] = [
   {
-    path: "/",
-    name: "HelloWorld",
-    component: HelloWorld,
-  },
-];
+    path: '/',
+    name: 'Index',
+    component: Index
+  }
+]
 
 const router = createRouter({
   routes: routerConfig,
-  history: createWebHashHistory(),
-});
+  history: createWebHashHistory()
+})
 
-export default router;
+export default router

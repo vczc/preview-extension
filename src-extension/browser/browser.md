@@ -2,7 +2,7 @@
 
 ## [@chiragrupani/karma-chromium-edge-launcher@2.3.1](https://www.npmjs.com/package/@chiragrupani/karma-chromium-edge-launcher)
 
-**edge 启动器**
+**edge 启动器 (暂没使用)**
 
 ## [karma-chrome-launcher@3.2.0](https://www.npmjs.com/package/karma-chrome-launcher)
 

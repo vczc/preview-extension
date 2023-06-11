@@ -1,1 +1,1 @@
-export * from './zopWebviewPanel'
+export * from './zop-webview-panel'
