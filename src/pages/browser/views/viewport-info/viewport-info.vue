@@ -1,0 +1,27 @@
+<script setup lang="ts"></script>
+
+<template>
+  <div class="viewport-info">viewport-info</div>
+</template>
+
+<style>
+.viewport-info {
+  background: rgba(240, 240, 240, 0.6);
+  padding: 6px;
+
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+
+  font-size: 13px;
+  color: #333;
+
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.hidden {
+  opacity: 0;
+}
+</style>

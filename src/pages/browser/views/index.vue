@@ -8,6 +8,7 @@ import Viewport from './viewport/index.vue'
 const store = usePageStore()
 const { state } = storeToRefs(store)
 const { increment } = store
+
 useIndexHook()
 </script>
 
