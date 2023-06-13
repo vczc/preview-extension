@@ -1,4 +1,4 @@
-import vscode, { Disposable, WebviewPanel, Uri, Webview, ViewColumn, ExtensionContext, commands } from 'vscode'
+import vscode, { Disposable, WebviewPanel, Webview, ViewColumn, ExtensionContext } from 'vscode'
 import * as path from 'path'
 import * as fs from 'fs'
 import { HeadlessBrowser } from './headless-browser'
@@ -6,9 +6,6 @@ import { CustomEventName, CdpPageEventName } from './const'
 import { ExtensionConfiguration } from './interface'
 
 export class ZopWebviewPanel extends HeadlessBrowser {
-  // 当前面板状态
-  // public static currentPanel: ZopWebviewPanel | undefined
-
   // webview 面板
   private _panel: WebviewPanel | any
 
@@ -30,23 +27,8 @@ export class ZopWebviewPanel extends HeadlessBrowser {
 
   /** webview panel 渲染 */
   public async loadWebview(url?: string): Promise<void> {
-    // if (ZopWebviewPanel.currentPanel) {
-    //   ZopWebviewPanel.currentPanel._panel.reveal(ViewColumn.One)
-    // } else {
-    // const name = 'Tortie Preview'
-    // const viewType = 'toolchain.tortie-preview'
-    // const panel = vscode.window.createWebviewPanel(viewType, name, ViewColumn.One, {
-    //   enableScripts: true,
-    //   retainContextWhenHidden: true,
-    //   localResourceRoots: [vscode.Uri.joinPath(ZopWebviewPanel._context.extensionUri, 'out', 'web-build', 'assets')]
-    // })
-    // ZopWebviewPanel.currentPanel = new ZopWebviewPanel(panel)
-    // }
     try {
       await this.launchPage()
-
-      // TODO:
-      this.cdp.on('test', () => {})
 
       this.cdp.else((type: any, data: any) => {
         console.log('🚀 panel cdp消息转发', { type, data })
@@ -124,53 +106,13 @@ export class ZopWebviewPanel extends HeadlessBrowser {
     webview.onDidReceiveMessage(
       msg => {
         const { type, params } = msg
-        console.log('插件接收消息~~~~~~~~', { type, params })
 
-        if (type === CustomEventName.UPDATE_TITLE) {
-          this._panel.title = params.title
-          return
-        }
-
-        if (type === CustomEventName.WINDOW_OPEN_REQUESTED) {
-          const url = params.url
-          new ZopWebviewPanel(url)
-        }
-
-        if (type === CustomEventName.OPEN_FILE) {
-        }
-
-        if (type === CustomEventName.WINDOW_DIALOG_REQUESTED) {
-          const actions: Record<string, () => void> = {
-            alert: () => {},
-            prompt: () => {},
-            confirm: () => {}
-          }
-
-          actions[type]?.()
-        }
-
-        if (type === CustomEventName.APP_STATE_CHANGED) {
-        }
-
+        // 插件向cdp协议发送消息
         this.cdp.send(type, params)
       },
       undefined,
       this._disposables
     )
-  }
-
-  /** cdp协议发送消息 */
-  private async _cdpSendMessage(type: string, params: any): Promise<void> {
-    try {
-      await this.cdp.send(type, params)
-    } catch (e) {
-      console.error('CDP failed to send message', e)
-    }
-  }
-
-  /** cdp协议接收消息 */
-  private _cdpReviceMessage() {
-    this.cdp.on('Animation.animationCreated', () => console.log('Animation created!'))
   }
 }
 

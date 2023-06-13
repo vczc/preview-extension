@@ -1,17 +1,29 @@
 import { defineStore } from 'pinia'
 import { reactive } from 'vue'
 import { State } from '../types/interface'
+import { recursiveUpdate } from '../utils/object'
+import { log } from '../utils/log'
 
 export const usePageStore = defineStore('page', () => {
   const state: State = reactive({
     url: 'about:blank',
-    count: 0,
-    frame: null,
     format: 'png',
     scrollWidth: 0,
     scrollHeight: 0,
     isInspectEnabled: false,
     isDeviceEmulationEnabled: false,
+    frame: {
+      base64Data: '',
+      metadata: {
+        deviceHeight: 0,
+        deviceWidth: 0,
+        offsetTop: 0,
+        pageScaleFactor: 0,
+        scrollOffsetX: 0,
+        scrollOffsetY: 0,
+        timestamp: 0
+      }
+    },
     history: {
       canGoBack: false,
       canGoForward: false
@@ -36,7 +48,19 @@ export const usePageStore = defineStore('page', () => {
   })
   function increment() {
     state.url = 'baidu.com'
+    log('state update', state)
   }
 
-  return { state, increment }
+  /** 批量递归更新共享状态 */
+  function updateState(obj: any, callback?: (state: State) => void) {
+    recursiveUpdate(state, obj)
+
+    log('state update', state)
+
+    if (callback && typeof callback === 'function') {
+      callback(state)
+    }
+  }
+
+  return { state, increment, updateState }
 })

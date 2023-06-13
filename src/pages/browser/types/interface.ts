@@ -1,8 +1,10 @@
+import exp from 'constants'
+
 export interface PostMessageType {
   vid: number
   vscode: any
   callbacks: Map<number, object>
-  send: <T>(type: string, params: any) => Promise<T>
+  send: <T>(type: string, params?: any) => Promise<T>
   publish: (name: string, data: any) => void
   subscribe: (name: string, fn: any) => void
   unsubscribe: (name: string, fn: any) => void
@@ -55,4 +57,25 @@ export interface ElementSource {
   columnNumber: number
   fileName: string
   lineNumber: string
+}
+
+export interface NavigationHistoryResponse {
+  currentIndex: number
+  entries: NavigationEntry[]
+}
+
+export interface NavigationEntry {
+  id: number
+  url: string
+  userTypedURL: string
+  title: string
+  transitionType: any
+}
+
+export interface ExtensionConfiguration {
+  chromeExecutable?: string
+  format?: 'jpeg' | 'png'
+  isVerboseMode?: boolean
+  startUrl?: string
+  columnNumber: number
 }

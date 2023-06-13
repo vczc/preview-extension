@@ -29,6 +29,8 @@ export enum CdpPageEventName {
   FRAME_RESIZED = 'Page.frameResized',
   /** 停止发送截屏视频帧中的每个帧 https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-stopScreencast */
   STOP_SCREENCAST = 'Page.stopScreencast',
+  /** 开始使用截屏视频帧事件发送每个帧 https://chromedevtools.github.io/devtools-protocol/tot/Page/#method-startScreencast */
+  START_SCREEN_CAST = 'Page.startScreencast',
   /** 在帧导航完成后触发。帧现在与新加载程序关联 https://chromedevtools.github.io/devtools-protocol/tot/Page/#event-frameNavigated */
   FRAME_NAVIGATED = 'Page.frameNavigated',
   /** 加载事件触发 https://chromedevtools.github.io/devtools-protocol/tot/Page/#event-loadEventFired */
