@@ -3,7 +3,7 @@ import { ref, inject, onUnmounted, onMounted } from 'vue'
 import { useIndexHook } from './index.hook'
 import { usePageStore } from '../services/store.service'
 import { storeToRefs } from 'pinia'
-import Viewport from './viewport/index.vue'
+import Viewport from './viewport/viewport.vue'
 
 const store = usePageStore()
 const { state } = storeToRefs(store)

@@ -1,9 +1,11 @@
-import vscode, { Disposable, WebviewPanel, Webview, ViewColumn, ExtensionContext } from 'vscode'
-import * as path from 'path'
 import * as fs from 'fs'
+import * as path from 'path'
+import vscode, { Disposable, WebviewPanel, Webview, ViewColumn, ExtensionContext } from 'vscode'
 import { HeadlessBrowser } from './headless-browser'
-import { CustomEventName, CdpPageEventName } from './const'
 import { ExtensionConfiguration } from './interface'
+import { CustomEventName, CdpPageEventName } from './const'
+import { readText, writeText, initFixedDprConfig } from './utils'
+import { promises } from 'dns'
 
 export class ZopWebviewPanel extends HeadlessBrowser {
   // webview 面板
@@ -27,16 +29,7 @@ export class ZopWebviewPanel extends HeadlessBrowser {
 
   /** webview panel 渲染 */
   public async loadWebview(url?: string): Promise<void> {
-    try {
-      await this.launchPage()
-
-      this.cdp.else((type: any, data: any) => {
-        console.log('🚀 panel cdp消息转发', { type, data })
-        this._sendWebviewPostMessage({ type, data })
-      })
-    } catch (e) {
-      console.log('puppeteer newPage failed', e)
-    }
+    await this.createBrowserPage()
 
     const name = 'Tortie Preview'
     const viewType = 'toolchain.tortie-preview'
@@ -61,6 +54,8 @@ export class ZopWebviewPanel extends HeadlessBrowser {
 
     // 通知web页面渲染规格
     this._sendWebviewPostMessage({ type: CustomEventName.APP_CONFIGURATION, result: this._webConfig })
+
+    initFixedDprConfig()
   }
 
   /** 获取webview html内容 */
@@ -84,11 +79,25 @@ export class ZopWebviewPanel extends HeadlessBrowser {
     return html
   }
 
+  /** 创建无头浏览器页面并连接cdp通信 */
+  private async createBrowserPage(): Promise<void> {
+    try {
+      await this.launchPage()
+
+      this.cdp.else((type: any, data: any) => {
+        console.log('🚀 panel cdp消息转发', { type, data })
+        this._sendWebviewPostMessage({ type, data })
+      })
+    } catch (e) {
+      console.log('puppeteer newPage failed', e)
+    }
+  }
+
   /** 资源循环清理 */
   public dispose(): void {
-    // ZopWebviewPanel.currentPanel = undefined
+    this._panel?.dispose()
 
-    this._panel.dispose()
+    this.browserDispose()
 
     while (this._disposables.length) {
       const disposeable = this._disposables.pop()
@@ -105,14 +114,34 @@ export class ZopWebviewPanel extends HeadlessBrowser {
   private _receiveWebviewMessage(webview: Webview) {
     webview.onDidReceiveMessage(
       msg => {
-        const { type, params } = msg
+        const { type, params, callbackId } = msg
 
-        // 插件向cdp协议发送消息
+        this._handleReceiveMessage(type, params, callbackId)
+
         this.cdp.send(type, params)
       },
       undefined,
       this._disposables
     )
+  }
+
+  /** 处理接收webview信息 */
+  private _handleReceiveMessage(action: string, data: object, callbackId?: number): void {
+    const { resolve, reject } = {
+      resolve: (result: any) => this.emit({ callbackId, result }),
+      reject: (err: any) => this.emit({ callbackId, error: err.message })
+    }
+
+    const actions: Record<string, any> = {
+      [CdpPageEventName.GO_FORWARD]: async () => await this.page.goForward(),
+      [CdpPageEventName.GO_BACKWARD]: async () => await this.page.goBack(),
+      [CustomEventName.READ_TEXT]: () => readText().then(resolve, reject),
+      [CustomEventName.WRITE_TEXT]: () => writeText((data as any).value).then(resolve, reject),
+      // 向cdp协议发送消息，获得结果再发回给webview
+      default: () => this.cdp.send(action, data).then(resolve, reject)
+    }
+
+    actions[action] ? actions[action]() : actions['default']()
   }
 }
 

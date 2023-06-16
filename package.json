@@ -49,6 +49,7 @@
     "@element-plus/icons-vue": "^2.1.0",
     "@types/node": "^18.15.11",
     "axios": "^1.4.0",
+    "comment-json": "^4.2.3",
     "cross-env": "^7.0.3",
     "dotenv": "^16.0.3",
     "element-plus": "2.3.0",

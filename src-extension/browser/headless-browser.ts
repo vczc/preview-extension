@@ -67,10 +67,15 @@ export class HeadlessBrowser extends EnhancedEventEmitter {
     // })
   }
 
-  private _dispose(): void {
+  /** 浏览器资源清理 */
+  public browserDispose(): void {
     this.cdp.dispose()
     this.page.close()
-    // TODO:
+
+    if (this.browser) {
+      this.browser.close()
+      this.browser = null
+    }
   }
 
   /** 获取chromium路径 */
