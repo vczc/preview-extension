@@ -55,7 +55,7 @@ export const usePageStore = defineStore('page', () => {
   function updateState(obj: any, callback?: (state: State) => void) {
     recursiveUpdate(state, obj)
 
-    log('state update', state)
+    log('state update', JSON.parse(JSON.stringify(state)))
 
     if (callback && typeof callback === 'function') {
       callback(state)

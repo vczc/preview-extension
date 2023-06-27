@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import { useViewportHook } from './viewport.hook'
+import { useViewportPageHook } from './viewport.hook'
 import Loading from '../loading-bar/loading-bar.vue'
 import ViewportInfo from '../viewport-info/viewport-info.vue'
 import CanvasRender from '../canvas-render/canvas-render.vue'
+import { usePageStore } from '../../services/store.service'
 
-useViewportHook()
+const store = usePageStore()
+const { viewportRef, viewportClass } = useViewportPageHook()
 </script>
 
 <template>
-  <div class="viewport">
-    <Loading percent="{this.viewportMetadata.loadingPercent}" />
-    <ViewportInfo height="{this.viewportMetadata.height}" width="{this.viewportMetadata.width}" />
+  <div :class="['viewport', viewportClass]" ref="viewportRef">
+    <Loading :percent="store.state.viewportMetadata.loadingPercent" />
+    <ViewportInfo :height="store.state.viewportMetadata.height" :width="store.state.viewportMetadata.width" />
     <!-- <Resizable className="viewport-resizable-wrap"> </Resizable> -->
     <CanvasRender />
   </div>

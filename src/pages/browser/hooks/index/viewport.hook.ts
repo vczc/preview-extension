@@ -5,11 +5,11 @@ import { useCdpHelperHook } from './cdp-helper.hook'
 interface PropParams {
   postMessage: PostMessageType
   store: { state: State }
-  strongUpdateState: (obj: any) => void
 }
 
 export function useViewportHook(props: PropParams) {
-  const { postMessage, store, strongUpdateState } = props
+  const { postMessage, store } = props
+  const { updateState } = store as any
   const { getCursorForNode, getNodeIdFromBackendId, resolveElementProperties } = useCdpHelperHook({ postMessage })
   /** 工具栏行为处理 */
   function onViewportChanged(action: string, data: any): void {
@@ -170,8 +170,8 @@ export function useViewportHook(props: PropParams) {
       postMessage.send(CdpPageEventName.SET_DEVICE_METRICS_OVERRIDE, {
         deviceScaleFactor: devicePixelRatio,
         mobile: false,
-        height: height,
-        width: width
+        height,
+        width
       })
 
       newViewport.height = height as number
@@ -206,6 +206,13 @@ export function useViewportHook(props: PropParams) {
 
     // this.viewport.calculateViewport();
     // TODO:
+  }
+
+  /** 具有副作用的状态更新 */
+  function strongUpdateState(obj: any): void {
+    /** 更新完共享状态，通知插件web页面状态，用于留存 */
+    updateState(obj)
+    // , state => postMessage.send(CustomEventName.APP_STATE_CHANGED, { ...JSON.parse(JSON.stringify(state)) })
   }
 
   return {

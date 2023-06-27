@@ -1,10 +1,25 @@
 <script setup lang="ts">
 import { useCanvasRenderHook } from './canvas-render.hook'
-useCanvasRenderHook()
+const { imageRef, canvasRef, handleMouseEvent, handleKeyEvent } = useCanvasRenderHook()
 </script>
 
 <template>
-  <div class="canvas-render">canvas-render</div>
+  <div class="fill-flex">
+    <img ref="imageRef" className="img-hidden" />
+    <canvas
+      className="screencast"
+      ref="canvasRef"
+      @mousedown="handleMouseEvent"
+      @mouseUp="handleMouseEvent"
+      @mouseMove="handleMouseEvent"
+      @click="handleMouseEvent"
+      @dblclick="handleMouseEvent"
+      @wheel="handleMouseEvent"
+      @keydown="handleKeyEvent"
+      @keyup="handleKeyEvent"
+      @keypress="handleKeyEvent"
+    />
+  </div>
 </template>
 
 <style>
@@ -16,5 +31,11 @@ useCanvasRenderHook()
 
 .img-hidden {
   display: none;
+}
+
+.fill-flex {
+  height: 100%;
+  width: 100%;
+  display: 'flex';
 }
 </style>

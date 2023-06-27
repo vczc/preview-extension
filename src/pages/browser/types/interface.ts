@@ -17,7 +17,7 @@ export interface Subscribe {
 
 export interface State {
   format: 'jpeg' | 'png'
-  frame: object | null
+  frame: any | null
   url: string
   isVerboseMode?: boolean
   isInspectEnabled: boolean

@@ -1,3 +1,4 @@
+import { json } from 'stream/consumers'
 import { EventCenter } from './event-center.service'
 
 export class postMessage extends EventCenter {
@@ -23,7 +24,7 @@ export class postMessage extends EventCenter {
       params,
       callbackId: id
     }
-    console.log('web发出消息 ', webviewParams)
+    console.log('📡📡 ', webviewParams)
 
     this.vscode?.postMessage?.(webviewParams)
 
@@ -35,10 +36,10 @@ export class postMessage extends EventCenter {
   // 接收插件消息
   recived(message: any): void {
     const object: any = message.data
-    console.log('web接收消息~~~~~~~~~~~~~', message)
 
     if (object) {
       const { type, data, callbackId } = object
+      console.log('📻📻', [type, data, callbackId])
       // 发送给插件层的某个请求返回消息时
       if (callbackId) {
         const callback: any = this.callbacks.get(callbackId)

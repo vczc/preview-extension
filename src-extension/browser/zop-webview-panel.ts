@@ -53,7 +53,7 @@ export class ZopWebviewPanel extends HeadlessBrowser {
     url && (this._webConfig.startUrl = url)
 
     // 通知web页面渲染规格
-    this._sendWebviewPostMessage({ type: CustomEventName.APP_CONFIGURATION, result: this._webConfig })
+    this._sendWebviewPostMessage({ type: CustomEventName.APP_CONFIGURATION, data: this._webConfig })
 
     initFixedDprConfig()
   }
@@ -85,7 +85,7 @@ export class ZopWebviewPanel extends HeadlessBrowser {
       await this.launchPage()
 
       this.cdp.else((type: any, data: any) => {
-        console.log('🚀 panel cdp消息转发', { type, data })
+        console.log('🚀🚀', { type, data })
         this._sendWebviewPostMessage({ type, data })
       })
     } catch (e) {
@@ -116,9 +116,14 @@ export class ZopWebviewPanel extends HeadlessBrowser {
       msg => {
         const { type, params, callbackId } = msg
 
+        if (type === CustomEventName.UPDATE_TITLE) {
+          this._panel.title = params.title
+          return
+        }
+
         this._handleReceiveMessage(type, params, callbackId)
 
-        this.cdp.send(type, params)
+        // this.cdp.send(type, params)
       },
       undefined,
       this._disposables
@@ -128,8 +133,15 @@ export class ZopWebviewPanel extends HeadlessBrowser {
   /** 处理接收webview信息 */
   private _handleReceiveMessage(action: string, data: object, callbackId?: number): void {
     const { resolve, reject } = {
-      resolve: (result: any) => this.emit({ callbackId, result }),
-      reject: (err: any) => this.emit({ callbackId, error: err.message })
+      resolve: (result: any) => {
+        console.log('📘📘', [result, callbackId])
+        this._sendWebviewPostMessage({ type: action, data: result, callbackId })
+        this.emit({ callbackId, result })
+      },
+      reject: (err: any) => {
+        console.log('🟥🟥', err)
+        this.emit({ callbackId, error: err.message })
+      }
     }
 
     const actions: Record<string, any> = {
@@ -138,7 +150,10 @@ export class ZopWebviewPanel extends HeadlessBrowser {
       [CustomEventName.READ_TEXT]: () => readText().then(resolve, reject),
       [CustomEventName.WRITE_TEXT]: () => writeText((data as any).value).then(resolve, reject),
       // 向cdp协议发送消息，获得结果再发回给webview
-      default: () => this.cdp.send(action, data).then(resolve, reject)
+      default: () => {
+        console.log('🌎🌎', [action, data])
+        this.cdp.send(action, data).then(resolve, reject)
+      }
     }
 
     actions[action] ? actions[action]() : actions['default']()

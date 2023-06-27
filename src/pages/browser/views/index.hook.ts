@@ -12,37 +12,31 @@ export function useIndexHook() {
   const { updateState } = store
   const hookParams = {
     postMessage,
-    store,
-    strongUpdateState
+    store
   }
   const { onViewportChanged, handleToggleInspect } = useViewportHook(hookParams)
-  const { handleViewportSizeChange } = useToolbarHook({ ...hookParams, onViewportChanged, handleToggleInspect })
+  const { handleViewportSizeChange } = useToolbarHook({ ...hookParams, strongUpdateState, onViewportChanged, handleToggleInspect })
 
   // 自定义事件订阅
   const customSubscribe: Subscribe[] = [
     {
       name: CustomEventName.VIEWPORT,
       callback: (data: IViewport) => {
-        console.log('插件视口变化~~~~~', data)
+        console.log('🏡🏡插件视口变化', data)
         handleViewportSizeChange(data)
       }
     },
     {
       name: CustomEventName.APP_CONFIGURATION,
       callback: (data: ExtensionConfiguration) => {
-        console.log('web页面规格数据~~~~~', data)
+        console.log('🏡🏡web页面规格数据', data)
         if (!data) {
           return
         }
 
         const { format = 'png', startUrl: url = 'about:blank', isVerboseMode = false } = data
 
-        strongUpdateState({
-          // url: data.startUrl ? data.startUrl : 'about:blank',
-          url,
-          format,
-          isVerboseMode
-        })
+        strongUpdateState({ url, format, isVerboseMode })
 
         url && postMessage.send(CdpPageEventName.NAVIGATE, { url })
       }
@@ -54,29 +48,22 @@ export function useIndexHook() {
     {
       name: CdpPageEventName.FRAME_RESIZED,
       callback: data => {
-        console.log('帧大小变化时~~~~~~~~', data)
+        console.log('🏡🏡帧大小变化时', data)
         stopCasting()
         startCasting()
       }
     },
     {
-      name: CdpPageEventName.SCREENCAST_FRAME,
-      callback: data => {
-        console.log('web开始截屏视频请求的压缩图像数据~~~~~~~~', data)
-      }
-    },
-
-    {
       name: CdpPageEventName.NAVIGATED_WITHIN_DOCUMENT,
       callback: data => {
-        console.log('当发生相同文档导航时触发，例如由于历史记录 API 使用或锚点导航~~~~~~~~', data)
+        console.log('🏡🏡当发生相同文档导航时触发，例如由于历史记录 API 使用或锚点导航', data)
         requestNavigationHistory()
       }
     },
     {
       name: CdpPageEventName.FRAME_NAVIGATED,
       callback: data => {
-        console.log('在帧导航完成后触发。帧现在与新加载程序关联~~~~~~~~', data)
+        console.log('🏡🏡在帧导航完成后触发。帧现在与新加载程序关联', data)
         const isMainFrame = !data.frame?.parentId
 
         if (isMainFrame) {
@@ -93,7 +80,7 @@ export function useIndexHook() {
     {
       name: CdpPageEventName.LOAD_EVENT_FIRED,
       callback: data => {
-        console.log('加载事件触发~~~~~~~~', data)
+        console.log('🏡🏡加载事件触发', data)
         strongUpdateState({ viewportMetadata: { loadingPercent: 1.0 } })
 
         setTimeout(() => {
@@ -104,28 +91,24 @@ export function useIndexHook() {
     {
       name: CdpPageEventName.SCREENCAST_FRAME,
       callback: data => {
-        console.log('开始截屏视频请求的压缩图像数据~~~~~~~~', data)
+        console.log('🏡🏡开始截屏视频请求的压缩图像数据', data)
         handleScreencastFrame(data)
       }
     },
     {
       name: CdpPageEventName.WINDOW_OPEN,
       callback: data => {
-        console.log('当要打开新窗口时触发，通过 window.open（）、链接单击、表单提交、 等~~~~~~~~', data)
+        console.log('🏡🏡当要打开新窗口时触发，通过 window.open（）、链接单击、表单提交、 等', data)
         postMessage.send(CustomEventName.WINDOW_OPEN_REQUESTED, { url: data.url })
       }
     },
     {
       name: CdpPageEventName.JAVASCRIPT_DIALOG_OPENING,
       callback: data => {
-        console.log('当 JavaScript 发起的对话框（警报、确认、提示或 onbeforeunload）即将触发 打开~~~~~~~~', data)
+        console.log('🏡🏡当 JavaScript 发起的对话框（警报、确认、提示或 onbeforeunload）即将触发 打开', data)
         const { url, message, type } = data
 
-        postMessage.send('extension.windowDialogRequested', {
-          url: url,
-          message: message,
-          type: type
-        })
+        postMessage.send(CustomEventName.WINDOW_DIALOG_REQUESTED, { url, message, type })
       }
     }
   ]
@@ -209,7 +192,7 @@ export function useIndexHook() {
       return
     }
 
-    console.log('请求导航历史记录~~~~~~~~~~~~', history)
+    console.log('🏡🏡请求导航历史记录', history)
     const historyIndex = history.currentIndex
     const historyEntries = history.entries
     const currentEntry = historyEntries[historyIndex]
@@ -243,7 +226,7 @@ export function useIndexHook() {
 
     postMessage.send(CdpPageEventName.SCREEN_CAST_FRAMEACK, { sessionId })
     postMessage.send(CdpPageEventName.GET_LAYOUT_METRICS).then((res: any) => {
-      const { width, height } = result.cssContentSize
+      const { width, height } = res.cssContentSize
       strongUpdateState({ scrollHeight: height, scrollWidth: width })
     })
 
